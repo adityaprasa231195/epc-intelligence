@@ -36,29 +36,29 @@ logging.basicConfig(level=logging.WARNING)
 # Session state initialisation (agents load once per session)
 # ------------------------------------------------------------------
 
-@st.cache_resource(show_spinner="Initialising AI agents and loading knowledge base...")
+@st.cache_resource(show_spinner="Initialising platform...")
 def init_platform():
-    """Load all agents once and cache for the session."""
-    # Validate API key early
+    """Load all agents once and cache for the session. Zero Groq calls here."""
     if not config.GROQ_API_KEY:
-        return None, "GROQ_API_KEY not set. Please add it to your .env file."
+        return None, "GROQ_API_KEY not set. Please add it to Streamlit Cloud secrets."
 
     rag = RAGEngine()
 
-    # Ingest standards if not already in collection
+    # Ingest standards — pure file I/O, no Groq
     if rag.collection_count() < 10:
         for fname in os.listdir(config.STANDARDS_DIR):
             if fname.endswith(".txt"):
                 fpath = os.path.join(config.STANDARDS_DIR, fname)
                 rag.ingest_file(fpath, source_label=fname)
 
+    # Agents are created here — GroqClient() instantiated but NOT called
     agents = {
-        "compliance": SpecComplianceAgent(rag=rag),
-        "schedule":   ScheduleRiskEngine(),
-        "supply":     SupplyChainAgent(),
+        "compliance":    SpecComplianceAgent(rag=rag),
+        "schedule":      ScheduleRiskEngine(),
+        "supply":        SupplyChainAgent(),
         "commissioning": CommissioningQACopilot(rag=rag),
-        "rfi":        RFIKnowledgeAgent(rag=rag),
-        "orchestrator": OrchestratorAgent(rag=rag),
+        "rfi":           RFIKnowledgeAgent(rag=rag),
+        "orchestrator":  OrchestratorAgent(rag=rag),
     }
     return agents, None
 
