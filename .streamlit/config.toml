@@ -8,3 +8,6 @@ gatherUsageStats = false
 
 [theme]
 base = "dark"
+
+[runner]
+fastReruns = false
