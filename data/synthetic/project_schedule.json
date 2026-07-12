@@ -1,0 +1,201 @@
+[
+  {
+    "task_id": "SCH-001",
+    "name": "Site Mobilisation",
+    "planned_start": "2026-04-12",
+    "planned_end": "2026-04-26",
+    "actual_start": "2026-04-12",
+    "lead_time_days": 0,
+    "buffer_days": 5,
+    "dependencies": [],
+    "status": "COMPLETED"
+  },
+  {
+    "task_id": "SCH-002",
+    "name": "Structural Steel Works",
+    "planned_start": "2026-04-28",
+    "planned_end": "2026-05-28",
+    "actual_start": "2026-04-28",
+    "lead_time_days": 0,
+    "buffer_days": 7,
+    "dependencies": [
+      "SCH-001"
+    ],
+    "status": "COMPLETED"
+  },
+  {
+    "task_id": "SCH-003",
+    "name": "Civil & Flooring",
+    "planned_start": "2026-05-30",
+    "planned_end": "2026-06-24",
+    "actual_start": "2026-05-30",
+    "lead_time_days": 0,
+    "buffer_days": 5,
+    "dependencies": [
+      "SCH-002"
+    ],
+    "status": "COMPLETED"
+  },
+  {
+    "task_id": "SCH-004",
+    "name": "MEP Rough-In",
+    "planned_start": "2026-06-26",
+    "planned_end": "2026-07-16",
+    "actual_start": "2026-06-26",
+    "lead_time_days": 0,
+    "buffer_days": 5,
+    "dependencies": [
+      "SCH-003"
+    ],
+    "status": "IN_PROGRESS"
+  },
+  {
+    "task_id": "SCH-005",
+    "name": "Generator Procurement",
+    "planned_start": "2026-07-18",
+    "planned_end": "2026-09-16",
+    "actual_start": "2026-07-26",
+    "lead_time_days": 65,
+    "buffer_days": 5,
+    "dependencies": [],
+    "status": "DELAYED"
+  },
+  {
+    "task_id": "SCH-006",
+    "name": "Generator Installation",
+    "planned_start": "2026-09-18",
+    "planned_end": "2026-09-28",
+    "actual_start": "2026-09-18",
+    "lead_time_days": 0,
+    "buffer_days": 3,
+    "dependencies": [
+      "SCH-002",
+      "SCH-005"
+    ],
+    "status": "NOT_STARTED"
+  },
+  {
+    "task_id": "SCH-007",
+    "name": "UPS Procurement",
+    "planned_start": "2026-09-30",
+    "planned_end": "2026-11-14",
+    "actual_start": "2026-10-10",
+    "lead_time_days": 48,
+    "buffer_days": 5,
+    "dependencies": [],
+    "status": "DELAYED"
+  },
+  {
+    "task_id": "SCH-008",
+    "name": "UPS Installation",
+    "planned_start": "2026-11-16",
+    "planned_end": "2026-11-26",
+    "actual_start": "2026-11-16",
+    "lead_time_days": 0,
+    "buffer_days": 3,
+    "dependencies": [
+      "SCH-004",
+      "SCH-007"
+    ],
+    "status": "NOT_STARTED"
+  },
+  {
+    "task_id": "SCH-009",
+    "name": "Cooling System Installation",
+    "planned_start": "2026-11-28",
+    "planned_end": "2026-12-18",
+    "actual_start": "2026-11-28",
+    "lead_time_days": 0,
+    "buffer_days": 5,
+    "dependencies": [
+      "SCH-004"
+    ],
+    "status": "NOT_STARTED"
+  },
+  {
+    "task_id": "SCH-010",
+    "name": "Electrical Distribution",
+    "planned_start": "2026-12-20",
+    "planned_end": "2027-01-04",
+    "actual_start": "2026-12-20",
+    "lead_time_days": 0,
+    "buffer_days": 5,
+    "dependencies": [
+      "SCH-004",
+      "SCH-008"
+    ],
+    "status": "NOT_STARTED"
+  },
+  {
+    "task_id": "SCH-011",
+    "name": "IT Infrastructure",
+    "planned_start": "2027-01-06",
+    "planned_end": "2027-01-21",
+    "actual_start": "2027-01-06",
+    "lead_time_days": 0,
+    "buffer_days": 4,
+    "dependencies": [
+      "SCH-010"
+    ],
+    "status": "NOT_STARTED"
+  },
+  {
+    "task_id": "SCH-012",
+    "name": "BMS & Controls",
+    "planned_start": "2027-01-23",
+    "planned_end": "2027-02-02",
+    "actual_start": "2027-01-23",
+    "lead_time_days": 0,
+    "buffer_days": 3,
+    "dependencies": [
+      "SCH-009",
+      "SCH-010",
+      "SCH-011"
+    ],
+    "status": "NOT_STARTED"
+  },
+  {
+    "task_id": "SCH-013",
+    "name": "Fire & Safety Systems",
+    "planned_start": "2027-02-04",
+    "planned_end": "2027-02-14",
+    "actual_start": "2027-02-04",
+    "lead_time_days": 0,
+    "buffer_days": 3,
+    "dependencies": [
+      "SCH-004"
+    ],
+    "status": "NOT_STARTED"
+  },
+  {
+    "task_id": "SCH-014",
+    "name": "Integrated System Testing",
+    "planned_start": "2027-02-16",
+    "planned_end": "2027-03-08",
+    "actual_start": "2027-02-16",
+    "lead_time_days": 0,
+    "buffer_days": 5,
+    "dependencies": [
+      "SCH-008",
+      "SCH-009",
+      "SCH-010",
+      "SCH-011",
+      "SCH-012",
+      "SCH-013"
+    ],
+    "status": "NOT_STARTED"
+  },
+  {
+    "task_id": "SCH-015",
+    "name": "Commissioning & Handover",
+    "planned_start": "2027-03-10",
+    "planned_end": "2027-03-20",
+    "actual_start": "2027-03-10",
+    "lead_time_days": 0,
+    "buffer_days": 3,
+    "dependencies": [
+      "SCH-014"
+    ],
+    "status": "NOT_STARTED"
+  }
+]

@@ -1,0 +1,112 @@
+[
+  {
+    "supplier_id": "SUP-001",
+    "name": "Cummins India",
+    "equipment_type": "Generator Set",
+    "origin_city": "Pune",
+    "destination_city": "Mumbai",
+    "lat": 18.52,
+    "lon": 73.85,
+    "shipment_status": "IN_TRANSIT",
+    "eta_days": 12
+  },
+  {
+    "supplier_id": "SUP-002",
+    "name": "Vertiv India",
+    "equipment_type": "UPS System",
+    "origin_city": "Pune",
+    "destination_city": "Mumbai",
+    "lat": 18.52,
+    "lon": 73.85,
+    "shipment_status": "IN_TRANSIT",
+    "eta_days": 5
+  },
+  {
+    "supplier_id": "SUP-003",
+    "name": "Schneider Electric",
+    "equipment_type": "PDU Rack Unit",
+    "origin_city": "Bangalore",
+    "destination_city": "Mumbai",
+    "lat": 12.97,
+    "lon": 77.59,
+    "shipment_status": "DISPATCHED",
+    "eta_days": 18
+  },
+  {
+    "supplier_id": "SUP-004",
+    "name": "STULZ India",
+    "equipment_type": "Precision AC Unit",
+    "origin_city": "Mumbai",
+    "destination_city": "Mumbai",
+    "lat": 19.07,
+    "lon": 72.87,
+    "shipment_status": "DELIVERED",
+    "eta_days": 0
+  },
+  {
+    "supplier_id": "SUP-005",
+    "name": "Paharpur Cooling",
+    "equipment_type": "Cooling Tower",
+    "origin_city": "Kolkata",
+    "destination_city": "Mumbai",
+    "lat": 22.57,
+    "lon": 88.36,
+    "shipment_status": "IN_TRANSIT",
+    "eta_days": 4
+  },
+  {
+    "supplier_id": "SUP-006",
+    "name": "ABB India",
+    "equipment_type": "LV Switchboard",
+    "origin_city": "Bangalore",
+    "destination_city": "Mumbai",
+    "lat": 12.97,
+    "lon": 77.59,
+    "shipment_status": "IN_TRANSIT",
+    "eta_days": 22
+  },
+  {
+    "supplier_id": "SUP-007",
+    "name": "Legrand India",
+    "equipment_type": "Cable Tray",
+    "origin_city": "Chennai",
+    "destination_city": "Mumbai",
+    "lat": 13.08,
+    "lon": 80.27,
+    "shipment_status": "DISPATCHED",
+    "eta_days": 15
+  },
+  {
+    "supplier_id": "SUP-008",
+    "name": "Delta Electronics",
+    "equipment_type": "Transfer Switch",
+    "origin_city": "Chennai",
+    "destination_city": "Mumbai",
+    "lat": 13.08,
+    "lon": 80.27,
+    "shipment_status": "IN_TRANSIT",
+    "eta_days": 9
+  },
+  {
+    "supplier_id": "SUP-009",
+    "name": "Havells India",
+    "equipment_type": "Busduct Riser",
+    "origin_city": "Noida",
+    "destination_city": "Mumbai",
+    "lat": 28.54,
+    "lon": 77.39,
+    "shipment_status": "IN_TRANSIT",
+    "eta_days": 11
+  },
+  {
+    "supplier_id": "SUP-010",
+    "name": "Emerson Network",
+    "equipment_type": "BMS Controller",
+    "origin_city": "Pune",
+    "destination_city": "Mumbai",
+    "lat": 18.52,
+    "lon": 73.85,
+    "shipment_status": "DELIVERED",
+    "eta_days": 0
+  }
+]

@@ -1,0 +1,182 @@
+[
+  {
+    "rfi_id": "RFI-001",
+    "subject": "UPS Bypass Rating",
+    "question": "Drawing E-205 shows 800A bypass. Spec Section 16480 requires 1000A. Which takes precedence?",
+    "resolution": "Spec Section 16480 takes precedence. Vendor to resubmit with 1000A bypass rating. DR-001 raised.",
+    "related_spec_clause": "Spec 16480 Clause 4.2",
+    "date": "2026-05-27",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-002",
+    "subject": "Earthing Conductor Cross-Section",
+    "question": "Spec requires 50x6mm copper earthing strip but vendor has submitted 40x5mm. Is this acceptable?",
+    "resolution": "Not acceptable. 50x6mm is minimum per IS 3043. Vendor must comply. NCR-007 logged.",
+    "related_spec_clause": "Spec 16060 Clause 3.1",
+    "date": "2026-06-29",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-003",
+    "subject": "Cooling Tower Clearance",
+    "question": "Drawing M-110 shows 1.2m clearance between cooling towers. ASHRAE recommends 1.5m. Confirm?",
+    "resolution": "Revise layout to 1.5m minimum clearance per ASHRAE 90.1. M-110 Rev B issued.",
+    "related_spec_clause": "Spec 15720 Clause 2.4",
+    "date": "2026-07-05",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-004",
+    "subject": "Cable Tray Loading",
+    "question": "What is the maximum permissible cable load per metre for 300mm wide GI cable tray?",
+    "resolution": "Per IEC 61537: 300mm GI tray (1.5mm thickness) rated at 45kg/m. Confirmed with manufacturer.",
+    "related_spec_clause": "Spec 16130 Clause 5.3",
+    "date": "2026-05-20",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-005",
+    "subject": "Generator Auto-Start Delay",
+    "question": "Spec states mains failure to generator start within 10 seconds. Vendor confirms 15s. Acceptable?",
+    "resolution": "10 seconds is contractual requirement per Uptime Institute Tier III. Vendor must modify controller.",
+    "related_spec_clause": "Spec 16230 Clause 7.1",
+    "date": "2026-06-19",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-006",
+    "subject": "UPS Battery Room Ventilation",
+    "question": "VRLA batteries proposed. Spec requires forced ventilation. Is natural ventilation acceptable for VRLA?",
+    "resolution": "Natural ventilation acceptable for VRLA per IEEE 1187 if room volume exceeds 30m3. Confirmed.",
+    "related_spec_clause": "Spec 16480 Clause 6.5",
+    "date": "2026-06-21",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-007",
+    "subject": "Fire Suppression Discharge Time",
+    "question": "FM-200 system design shows 10-second discharge. TIA-942 requires less than 10 seconds. Confirm.",
+    "resolution": "Discharge must be \u226410 seconds per TIA-942-B Section 5.9. Redesign required \u2014 new calc submitted.",
+    "related_spec_clause": "TIA-942-B Section 5.9",
+    "date": "2026-06-22",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-008",
+    "subject": "Raised Floor Load Rating",
+    "question": "Drawing A-301 specifies 12kN/m2 raised floor. Server racks may exceed this. Confirm adequacy.",
+    "resolution": "12kN/m2 (1200 kg/m2) exceeds maximum rack density of 1000 kg/m2. Current spec is adequate.",
+    "related_spec_clause": "Spec 03300 Clause 4.1",
+    "date": "2026-06-28",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-009",
+    "subject": "Fibre Optic Cable Route",
+    "question": "Preferred cable route conflicts with structural beam at grid E-7. Alternate route via C-7 feasible?",
+    "resolution": "Route via C-7 approved. Drawing N-115 Rev C issued. No impact to critical path.",
+    "related_spec_clause": "Spec 27130 Clause 2.1",
+    "date": "2026-05-20",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-010",
+    "subject": "BMS Protocol Compatibility",
+    "question": "BMS controller supports BACnet/IP. DCIM vendor requires Modbus TCP. Interface gateway required?",
+    "resolution": "Provide BACnet/IP to Modbus TCP gateway \u2014 Anybus X-Gateway approved. Add to BOM.",
+    "related_spec_clause": "Spec 17500 Clause 3.2",
+    "date": "2026-06-30",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-011",
+    "subject": "Containment System Material",
+    "question": "Drawing M-205 shows aluminium containment. Spec says steel. Cost saving possible with aluminium?",
+    "resolution": "Steel containment required per fire rating requirements (FR-30). Aluminium not acceptable.",
+    "related_spec_clause": "Spec 15830 Clause 1.3",
+    "date": "2026-05-24",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-012",
+    "subject": "Generator Fuel Tank Capacity",
+    "question": "Spec requires 24h fuel autonomy at full load. Vendor tank is sized for 20h. Acceptable?",
+    "resolution": "24h autonomy is minimum per Tier III requirements. Vendor must upsize tank. NCR-012 raised.",
+    "related_spec_clause": "Spec 16230 Clause 4.8",
+    "date": "2026-05-20",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-013",
+    "subject": "VESDA Detector Spacing",
+    "question": "VESDA capillary tube spacing shown as 6m on drawing. AS 1603.6 recommends 5m. Confirm.",
+    "resolution": "Spacing must comply with AS 1603.6 maximum 5m. Drawing S-401 revised to 5m spacing.",
+    "related_spec_clause": "AS 1603.6 Clause 4.3",
+    "date": "2026-06-02",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-014",
+    "subject": "PDU Input Plug Type",
+    "question": "PDUs specified with IEC 309 3P+N+E 32A inlet. Busduct tap-offs are 63A. Adapter required?",
+    "resolution": "Provide 63A to 32A step-down pigtail adapter per IEC 60309. Add to electrical BOM.",
+    "related_spec_clause": "Spec 16490 Clause 2.6",
+    "date": "2026-07-01",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-015",
+    "subject": "Seismic Bracing for Racks",
+    "question": "Project site is in Zone II seismic area. Are server racks required to be seismically braced?",
+    "resolution": "Seismic bracing required per IS 1893 Zone II. Vendor to supply floor-anchoring kit for all racks.",
+    "related_spec_clause": "IS 1893 Clause 7.4",
+    "date": "2026-05-30",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-016",
+    "subject": "Emergency Power Off Button Location",
+    "question": "EPO button location not shown on drawings. Code requires at main entrance. Confirm location.",
+    "resolution": "EPO buttons to be located at each data hall entrance and at the main electrical room per NFPA 75.",
+    "related_spec_clause": "NFPA 75 Section 8.2",
+    "date": "2026-06-09",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-017",
+    "subject": "Hot Aisle Containment Door Width",
+    "question": "Containment end doors shown as 800mm wide. Racks are 800mm deep. Clearance issue \u2014 confirm.",
+    "resolution": "End doors must be minimum 900mm wide to accommodate rack depth plus cable management.",
+    "related_spec_clause": "Spec 15830 Clause 3.1",
+    "date": "2026-07-04",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-018",
+    "subject": "Grounding of Cable Trays",
+    "question": "Drawing E-310 does not show cable tray grounding lugs. Are grounding continuity bonds required?",
+    "resolution": "Continuous grounding required per NEC 392.60. Add grounding lugs at every 15m tray section.",
+    "related_spec_clause": "NEC 392.60",
+    "date": "2026-07-05",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-019",
+    "subject": "CRAC Unit Condensate Drainage",
+    "question": "Drawing M-115 shows condensate drain to nearest floor drain. Spec requires dedicated drain. Confirm.",
+    "resolution": "Dedicated condensate drain line required per spec. Drawing M-115 Rev D issued with dedicated route.",
+    "related_spec_clause": "Spec 15720 Clause 5.2",
+    "date": "2026-07-01",
+    "status": "CLOSED"
+  },
+  {
+    "rfi_id": "RFI-020",
+    "subject": "UPS System Parallel Redundancy",
+    "question": "Two UPS units specified in parallel. Confirm N+1 or 2N configuration required per Tier III?",
+    "resolution": "Tier III requires N+1 minimum. 2N configuration provided exceeds requirement \u2014 confirmed acceptable.",
+    "related_spec_clause": "Uptime Institute Tier III Section 3.5",
+    "date": "2026-06-23",
+    "status": "CLOSED"
+  }
+]

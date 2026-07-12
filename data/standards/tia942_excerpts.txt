@@ -1,0 +1,81 @@
+SOURCE: TIA-942-B Data Center Standards — Key Excerpts for Commissioning QA
+
+SECTION 1 — SCOPE AND RATINGS
+TIA-942-B defines four rated levels (Rating 1 through Rating 4) for data centre infrastructure.
+Rating 1 (Basic) provides no redundancy. Rating 2 provides redundant components. Rating 3 provides concurrently maintainable paths. Rating 4 provides fault-tolerant infrastructure with no single point of failure.
+Each rating level applies independently to the electrical, mechanical, telecom, and architectural subsystems.
+
+SECTION 2 — ELECTRICAL REQUIREMENTS
+
+2.1 UPS Systems
+UPS systems must be sized to provide full IT load support including future capacity at maximum anticipated growth. For Rating 3 and Rating 4 facilities, UPS systems must be configured N+1 minimum. For Rating 4, a 2N configuration is required.
+UPS battery autonomy must be minimum 10 minutes at full design load for Rating 3. Rating 4 requires minimum 12 minutes.
+UPS bypass ratings must match the full upstream protection device rating. Bypass switches must be manually operated with lockout-tagout capability.
+Automatic Transfer Switch (ATS) must transfer from mains to generator within 10 seconds of mains failure detection for Rating 3 and Rating 4 facilities.
+
+2.2 Generator Systems
+Emergency generators must be sized to support 100% of the critical IT load plus all mechanical loads required to maintain the IT environment.
+Generators must start and achieve rated voltage and frequency within 10 seconds of mains failure. Fuel tank capacity must support minimum 24 hours of continuous operation at full load for Rating 3. Rating 4 requires 72 hours.
+Generator rooms must have automatic fire suppression systems and must be acoustically treated to local codes.
+
+2.3 Power Distribution
+Main Low Voltage (LV) switchboards must be fitted with metering on all feeders. All circuit breakers must be draw-out type for Rating 3 and Rating 4 facilities.
+Power Distribution Units (PDUs) must be rated for minimum 80% of their nameplate capacity under continuous load. PDUs must include input metering and individual outlet monitoring.
+Cable management must use segregated containment for power and data cables. Minimum 300mm wide cable trays for power circuits rated above 100A.
+
+SECTION 3 — MECHANICAL REQUIREMENTS
+
+3.1 Cooling Systems
+Data hall cooling must maintain inlet air temperature between 18°C and 27°C per ASHRAE A1 equipment class.
+Cooling systems must be N+1 redundant for Rating 3. Rating 4 requires 2N cooling infrastructure.
+Hot aisle/cold aisle containment is required for all new data hall designs. Mixing of hot and cold airstreams is not permitted.
+Precision Air Conditioning (PAC) units must be sized based on sensible heat ratio — total cooling capacity must not be applied without derating for latent load.
+
+3.2 Cooling Tower and Chiller Systems
+Cooling towers must have a minimum clearance of 1.5 metres between adjacent tower banks per ASHRAE recommendations.
+Chiller systems must be installed with variable speed drives on all pumps and compressors for energy efficiency compliance.
+Condenser water treatment systems must be provided to prevent scaling, corrosion, and biological growth in open cooling tower systems.
+
+3.3 Containment and Airflow
+Hot aisle containment end doors must provide minimum 900mm clear opening to accommodate rack depth and cable management.
+Raised floor plenum depth must be minimum 600mm to allow adequate airflow distribution for tile perforations.
+Perforated floor tiles must be positioned only in cold aisles and sized to match cooling unit airflow capacity.
+
+SECTION 4 — FIRE PROTECTION
+
+4.1 Suppression Systems
+Data halls must be protected by pre-action sprinkler systems or clean agent suppression systems.
+FM-200 and Novec 1230 are acceptable clean agents. Discharge time from detection to full concentration must be 10 seconds or less.
+VESDA (Very Early Smoke Detection Apparatus) systems must be installed in all Rating 3 and Rating 4 data halls. Capillary tube spacing must not exceed 5 metres per AS 1603.6.
+Emergency Power Off (EPO) buttons must be located at each data hall exit and at the main electrical room entrance per NFPA 75.
+
+SECTION 5 — COMMISSIONING REQUIREMENTS
+
+5.1 Commissioning Philosophy
+All systems must be commissioned individually (Level 1) before integrated system testing (Level 2) begins.
+Level 1 commissioning verifies individual component operation against manufacturer specifications and project specifications.
+Level 2 commissioning verifies integrated system operation including redundancy switching, automatic transfer, and alarm response under simulated fault conditions.
+
+5.2 Electrical Commissioning Sequence
+Step 1: Verify all earthing and bonding connections against design drawings. Measure earth resistance — must not exceed 1 ohm.
+Step 2: Perform insulation resistance testing on all power cables at 1000V DC. Minimum acceptable: 100 MΩ.
+Step 3: Energise and test main LV switchboard — verify metering, protection relay settings, and interlocking.
+Step 4: Test each UPS unit individually — verify bypass operation, battery autonomy, and alarm outputs.
+Step 5: Test ATS operation — simulate mains failure and verify transfer within 10 seconds.
+Step 6: Start generators under no-load conditions and verify speed, voltage, and frequency. Load test at 25%, 50%, 75%, and 100% of nameplate rating.
+Step 7: Perform integrated UPS-Generator transfer test — simulate mains failure and verify seamless transition through UPS to generator power.
+
+5.3 Mechanical Commissioning Sequence
+Step 1: Flush and clean all chilled water pipework before connecting to equipment.
+Step 2: Pressure test all chilled water circuits at 1.5x design working pressure for minimum 2 hours.
+Step 3: Balance all air handling unit airflows to within ±10% of design values.
+Step 4: Commission variable speed drives on all pumps and fans — verify ramp rates and control response.
+Step 5: Verify cooling tower water treatment system operation and set chemical dosing.
+Step 6: Perform combined cooling system load test — operate at design IT load for minimum 4 hours and verify temperature stability.
+Step 7: Test N+1 redundancy — isolate one cooling unit and verify remaining units maintain temperature within limits.
+
+5.4 Integrated System Test (IST) Requirements
+The IST must be witnessed by the owner's representative and the commissioning authority.
+Test scenarios must include: mains power failure, generator failure, cooling unit failure, fire alarm activation, and EPO activation.
+All test results must be documented in standardised test records including: test procedure, acceptance criteria, measured result, and pass/fail status.
+Deviations from acceptance criteria must be documented as non-conformance reports (NCRs) and resolved before handover.

@@ -1,0 +1,15 @@
+# Environment — never commit API keys
+.env
+.streamlit/secrets.toml
+
+# ChromaDB local vector store
+.chroma_db/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db

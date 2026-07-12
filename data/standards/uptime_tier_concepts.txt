@@ -1,0 +1,87 @@
+SOURCE: Uptime Institute Tier Standard — Concepts and Commissioning Requirements
+
+TIER CLASSIFICATION OVERVIEW
+
+The Uptime Institute Tier Standard defines four discrete tiers of data centre infrastructure. Each tier represents a progressively more resilient design. A data centre is rated at the lowest tier level achieved across all four subsystems: architectural, electrical, mechanical, and telecommunications.
+
+Tier I — Basic Capacity
+Tier I facilities have a single path for power and cooling distribution, with no redundant components. Planned and unplanned maintenance requires a full shutdown of the IT environment. Annual downtime: 28.8 hours (99.671% availability).
+
+Tier II — Redundant Components
+Tier II facilities have a single path for power and cooling with redundant components (N+1). Redundant component maintenance can be performed without shutting down IT systems but requires careful coordination. Annual downtime: 22.0 hours (99.741% availability).
+
+Tier III — Concurrently Maintainable
+Tier III facilities have multiple independent paths for power and cooling. Only one path is active at a time. All IT equipment must be dual-powered. Any single component or path can be maintained, repaired, or replaced without shutting down IT operations. Annual downtime: 1.6 hours (99.982% availability).
+Key requirements for Tier III:
+- N+1 UPS configuration minimum with separate distribution paths
+- Generator fuel for minimum 12 hours (Uptime) / 24 hours (TIA-942)
+- N+1 mechanical cooling with independent distribution
+- All planned maintenance without IT load interruption
+- Automatic transfer of power between paths within 10 seconds
+
+Tier IV — Fault Tolerant
+Tier IV facilities have multiple active simultaneous power and cooling distribution paths. Any single failure or planned maintenance of any component does not interrupt IT operations. Annual downtime: 0.4 hours (99.995% availability).
+Key requirements for Tier IV:
+- 2N electrical and mechanical infrastructure
+- Continuous cooling — no interruption permitted under any single fault
+- All components independently fault-tolerant
+- Compartmentalisation to prevent fault propagation
+
+TIER III COMMISSIONING VERIFICATION CHECKLIST
+
+The following items must be verified during Tier III commissioning:
+
+POWER SYSTEMS
+1. Dual independent utility feeds confirmed and tested.
+2. UPS N+1 redundancy verified — one UPS removed from service while IT load maintained.
+3. UPS battery autonomy test: full IT load for minimum 10 minutes without utility or generator.
+4. Generator start and load acceptance test: from mains failure to full generator load within 10 seconds.
+5. Generator fuel level and consumption verified for 24-hour autonomy.
+6. ATS operation verified: seamless transfer with no IT load interruption.
+7. All PDU input feeds dual-sourced and verified under switchover conditions.
+8. Power path 1 to path 2 manual switchover performed without IT outage.
+
+COOLING SYSTEMS
+9. N+1 cooling verified: one cooling unit isolated, remaining units maintain data hall temperature within ASHRAE A1 limits (18°C–27°C inlet).
+10. Chilled water loop pressurisation and flow balancing verified.
+11. Cooling tower operation verified including water treatment system.
+12. Hot aisle containment integrity verified — no bypass airflow paths.
+13. Raised floor airflow distribution balanced to within ±10% of design.
+
+FIRE AND LIFE SAFETY
+14. VESDA system functional test: smoke introduced at each sampling point, response time recorded.
+15. Clean agent suppression discharge test (simulated): verify all detectors trigger release within 10 seconds.
+16. EPO button test at each data hall entrance: IT load shutdown confirmed.
+17. Fire alarm integration with BMS verified — CRAC units shut down on alarm.
+
+TELECOMMUNICATIONS
+18. Redundant fibre entry paths confirmed from separate entry points.
+19. All structured cabling tested to TIA-568 standards — insertion loss and return loss within limits.
+20. Network equipment redundancy verified: no single switch failure causes connectivity loss.
+
+INTEGRATED SYSTEM TEST SCENARIOS FOR TIER III
+Scenario A: Utility Power Failure — simulate loss of all utility power. Verify UPS sustains load, generator starts within 10 seconds, and ATS transfers without IT interruption.
+Scenario B: Generator Failure — with IT on generator power, simulate generator failure. Verify UPS battery supports load until power restored.
+Scenario C: Cooling Unit Failure — isolate one cooling unit. Verify redundant units maintain temperature. Monitor for minimum 30 minutes.
+Scenario D: Fire Alarm Activation — activate fire alarm. Verify EPO operation, suppression system pre-alarm, and BMS integration.
+Scenario E: Concurrent Maintainability Demonstration — perform scheduled maintenance on one power path while IT systems operate continuously on the alternate path.
+
+DOCUMENTATION REQUIREMENTS
+All commissioning test results must be compiled into a Commissioning Report Package containing:
+1. Test procedure for each test (referencing standard or specification clause)
+2. Acceptance criteria
+3. Measured/observed result
+4. Pass or Fail determination
+5. Tester name, date, and witness signature
+6. Non-Conformance Reports (NCRs) for any failures
+7. NCR closure evidence before handover
+
+COMMON NON-CONFORMANCES IN TIER III COMMISSIONING
+- Generator start time exceeding 10 seconds (most common electrical NCR)
+- Inadequate fuel tank capacity (24h minimum frequently under-specified)
+- Hot aisle containment bypass through cable cutouts
+- UPS bypass rating lower than upstream protection
+- VESDA capillary spacing exceeding 5 metre maximum
+- Earthing resistance above 1 ohm limit
+- Cable tray grounding continuity not maintained
+- ATS transfer time exceeding 10 seconds under load

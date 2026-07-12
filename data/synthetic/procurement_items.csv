@@ -1,0 +1,51 @@
+item_id,name,category,spec_requirement,vendor_submitted_value,unit,status
+PROC-001,UPS System A,Power,500kVA,500kVA,kVA,COMPLIANT
+PROC-002,UPS System B,Power,500kVA,480kVA,kVA,DEVIATION
+PROC-003,Generator Set 1,Power,2000kW,2000kW,kW,COMPLIANT
+PROC-004,Generator Set 2,Power,2000kW,2000kW,kW,COMPLIANT
+PROC-005,Precision AC Unit 1,Cooling,150kW,150kW,kW,COMPLIANT
+PROC-006,Precision AC Unit 2,Cooling,150kW,150kW,kW,COMPLIANT
+PROC-007,Chiller Unit A,Cooling,500RT,450RT,RT,DEVIATION
+PROC-008,Chiller Unit B,Cooling,500RT,500RT,RT,COMPLIANT
+PROC-009,Cooling Tower 1,Cooling,600RT,600RT,RT,COMPLIANT
+PROC-010,Cooling Tower 2,Cooling,600RT,600RT,RT,COMPLIANT
+PROC-011,Main LV Switchboard,Electrical,4000A,4000A,A,COMPLIANT
+PROC-012,Sub LV Switchboard 1,Electrical,2000A,2000A,A,COMPLIANT
+PROC-013,Sub LV Switchboard 2,Electrical,2000A,2000A,A,COMPLIANT
+PROC-014,Busduct Riser A,Electrical,3200A,3200A,A,COMPLIANT
+PROC-015,Busduct Riser B,Electrical,3200A,3200A,A,COMPLIANT
+PROC-016,PDU Rack Unit 1,IT Power,32A,32A,A,COMPLIANT
+PROC-017,PDU Rack Unit 2,IT Power,32A,32A,A,COMPLIANT
+PROC-018,PDU Rack Unit 3,IT Power,32A,32A,A,COMPLIANT
+PROC-019,Top-of-Rack Switch 1,Network,48port-25G,48port-10G,port,DEVIATION
+PROC-020,Top-of-Rack Switch 2,Network,48port-25G,48port-25G,port,COMPLIANT
+PROC-021,Core Router A,Network,100G,100G,G,COMPLIANT
+PROC-022,Core Router B,Network,100G,100G,G,COMPLIANT
+PROC-023,Fire Suppression Tank,Safety,5000L,5000L,L,COMPLIANT
+PROC-024,FM200 Cylinder 1,Safety,100kg,100kg,kg,COMPLIANT
+PROC-025,FM200 Cylinder 2,Safety,100kg,100kg,kg,COMPLIANT
+PROC-026,VESDA Detector Array,Safety,Zone-A,Zone-A,Zone,COMPLIANT
+PROC-027,BMS Controller,Controls,BACnet-IP,BACnet-IP,Protocol,COMPLIANT
+PROC-028,DCIM Software License,Controls,1000-rack,1000-rack,racks,COMPLIANT
+PROC-029,Containment System A,Civil,Hot-Aisle,Hot-Aisle,Type,COMPLIANT
+PROC-030,Containment System B,Civil,Hot-Aisle,Hot-Aisle,Type,COMPLIANT
+PROC-031,Raised Floor Panel 1,Civil,600x600mm,600x600mm,mm,COMPLIANT
+PROC-032,Raised Floor Panel 2,Civil,600x600mm,600x600mm,mm,COMPLIANT
+PROC-033,Cable Tray Section 1,Civil,300mm-GI,300mm-GI,mm,COMPLIANT
+PROC-034,Cable Tray Section 2,Civil,300mm-GI,300mm-GI,mm,COMPLIANT
+PROC-035,Cable Tray Section 3,Civil,300mm-GI,300mm-GI,mm,COMPLIANT
+PROC-036,Server Rack 42U A,Infrastructure,42U-800W,42U-800W,U,COMPLIANT
+PROC-037,Server Rack 42U B,Infrastructure,42U-800W,42U-800W,U,COMPLIANT
+PROC-038,Server Rack 42U C,Infrastructure,42U-800W,42U-800W,U,COMPLIANT
+PROC-039,Lighting Panel LP1,Electrical,63A,63A,A,COMPLIANT
+PROC-040,Lighting Panel LP2,Electrical,63A,63A,A,COMPLIANT
+PROC-041,Earthing Strip 1,Electrical,50x6mm-Cu,50x6mm-Cu,mm,COMPLIANT
+PROC-042,Earthing Strip 2,Electrical,50x6mm-Cu,50x6mm-Cu,mm,COMPLIANT
+PROC-043,Transfer Switch ATS1,Power,4000A-Auto,4000A-Auto,A,COMPLIANT
+PROC-044,Transfer Switch ATS2,Power,4000A-Auto,4000A-Auto,A,COMPLIANT
+PROC-045,UPS Battery String 1,Power,192V-500Ah,192V-400Ah,Ah,DEVIATION
+PROC-046,UPS Battery String 2,Power,192V-500Ah,192V-500Ah,Ah,COMPLIANT
+PROC-047,Fibre Patch Panel 1,Network,96port-LC,96port-LC,port,COMPLIANT
+PROC-048,Fibre Patch Panel 2,Network,96port-LC,96port-LC,port,COMPLIANT
+PROC-049,Emergency Lighting 1,Safety,90min-LED,90min-LED,min,COMPLIANT
+PROC-050,Emergency Lighting 2,Safety,90min-LED,90min-LED,min,COMPLIANT
