@@ -203,36 +203,35 @@ def main():
 
         st.divider()
 
-        # Project status — computed once, stored in session state
+        # Project status — computed once per session, never on every rerun
         st.markdown("### [==] Project Status")
         if "project_stats" not in st.session_state:
-            compliance_report = agents["compliance"].check_all()
-            supply_summary    = agents["supply"].summary()
-            schedule_report   = agents["schedule"].analyse(skip_mitigations=True)
+            _cr = agents["compliance"].check_all()
+            _ss = agents["supply"].summary()
+            _sr = agents["schedule"].analyse(skip_mitigations=True)
             st.session_state["project_stats"] = {
-                "open_ncrs": compliance_report.summary()["open_ncrs"],
-                "at_risk": supply_summary["at_risk"],
-                "schedule_risk": schedule_report.overall_risk,
-                "critical_violations": len(schedule_report.critical_path_violations),
+                "open_ncrs": _cr.summary()["open_ncrs"],
+                "at_risk": _ss["at_risk"],
+                "schedule_risk": _sr.overall_risk,
+                "critical_violations": len(_sr.critical_path_violations),
             }
-            st.session_state["compliance_report"] = compliance_report
-            st.session_state["schedule_report"] = schedule_report
-            st.session_state["supply_summary"] = supply_summary
+            st.session_state["compliance_report"] = _cr
+            st.session_state["schedule_report"] = _sr
+            st.session_state["supply_summary"] = _ss
 
-        stats = st.session_state["project_stats"]
+        _stats = st.session_state["project_stats"]
         col1, col2 = st.columns(2)
-        col1.metric("Open NCRs", stats["open_ncrs"])
-        col2.metric("At-Risk Shipments", stats["at_risk"])
-        col1.metric("Schedule Risk", stats["schedule_risk"])
-        col2.metric("Critical Violations", stats["critical_violations"])
+        col1.metric("Open NCRs", _stats["open_ncrs"])
+        col2.metric("At-Risk Shipments", _stats["at_risk"])
+        col1.metric("Schedule Risk", _stats["schedule_risk"])
+        col2.metric("Critical Violations", _stats["critical_violations"])
 
     # ------------------------------------------------------------------
     # Main tabs
     # ------------------------------------------------------------------
-    # Pull reports from session state (computed once in sidebar)
+    # Pull reports from session state — computed once, never recomputed on reruns
     compliance_report = st.session_state.get("compliance_report") or agents["compliance"].check_all()
-    schedule_report   = st.session_state.get("schedule_report") or agents["schedule"].analyse(skip_mitigations=True)
-    supply_summary    = st.session_state.get("supply_summary") or agents["supply"].summary()
+    schedule_report   = st.session_state.get("schedule_report")   or agents["schedule"].analyse(skip_mitigations=True)
 
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "[*] Compliance",
