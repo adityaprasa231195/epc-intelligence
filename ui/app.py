@@ -203,22 +203,37 @@ def main():
 
         st.divider()
 
-        # Project status — deterministic only, zero Groq calls on load
+        # Project status — computed once, stored in session state
         st.markdown("### [==] Project Status")
-        compliance_report = agents["compliance"].check_all()
-        supply_summary    = agents["supply"].summary()
-        # Schedule summary is deterministic (risk scoring is math, not LLM)
-        schedule_report   = agents["schedule"].analyse(skip_mitigations=True)
+        if "project_stats" not in st.session_state:
+            compliance_report = agents["compliance"].check_all()
+            supply_summary    = agents["supply"].summary()
+            schedule_report   = agents["schedule"].analyse(skip_mitigations=True)
+            st.session_state["project_stats"] = {
+                "open_ncrs": compliance_report.summary()["open_ncrs"],
+                "at_risk": supply_summary["at_risk"],
+                "schedule_risk": schedule_report.overall_risk,
+                "critical_violations": len(schedule_report.critical_path_violations),
+            }
+            st.session_state["compliance_report"] = compliance_report
+            st.session_state["schedule_report"] = schedule_report
+            st.session_state["supply_summary"] = supply_summary
 
+        stats = st.session_state["project_stats"]
         col1, col2 = st.columns(2)
-        col1.metric("Open NCRs", compliance_report.summary()["open_ncrs"])
-        col2.metric("At-Risk Shipments", supply_summary["at_risk"])
-        col1.metric("Schedule Risk", schedule_report.overall_risk)
-        col2.metric("Critical Violations", len(schedule_report.critical_path_violations))
+        col1.metric("Open NCRs", stats["open_ncrs"])
+        col2.metric("At-Risk Shipments", stats["at_risk"])
+        col1.metric("Schedule Risk", stats["schedule_risk"])
+        col2.metric("Critical Violations", stats["critical_violations"])
 
     # ------------------------------------------------------------------
     # Main tabs
     # ------------------------------------------------------------------
+    # Pull reports from session state (computed once in sidebar)
+    compliance_report = st.session_state.get("compliance_report") or agents["compliance"].check_all()
+    schedule_report   = st.session_state.get("schedule_report") or agents["schedule"].analyse(skip_mitigations=True)
+    supply_summary    = st.session_state.get("supply_summary") or agents["supply"].summary()
+
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
         "[*] Compliance",
         "[~] Schedule Risk",

@@ -58,11 +58,14 @@ class GroqClient:
         prompt: str,
         model: str | None = None,
         system_instruction: str | None = None,
+        startup_call: bool = False,
     ) -> dict:
         """
         Generate text. Returns:
             {"error": False, "text": "..."}
             {"error": True,  "reason": "...", "text": ""}
+
+        startup_call=True: returns fallback immediately on 429 (never blocks startup)
         """
         self._init()
         model = model or config.GROQ_TEXT_MODEL
@@ -83,6 +86,9 @@ class GroqClient:
                 return {"error": False, "text": response.choices[0].message.content or ""}
 
             except RateLimitError as exc:
+                # On startup, never block — return fallback immediately
+                if startup_call:
+                    return _fallback("Rate limit — will retry when user interacts")
                 wait = _parse_retry_after(str(exc))
                 logger.warning(
                     "Groq 429 rate limit on attempt %d — waiting %.1fs", attempt, wait
@@ -90,7 +96,7 @@ class GroqClient:
                 if attempt < _MAX_RETRIES:
                     time.sleep(wait)
                 else:
-                    return _fallback(f"Rate limit exceeded — please wait and retry. ({exc})")
+                    return _fallback(f"Rate limit exceeded — please wait and retry.")
 
             except Exception as exc:  # noqa: BLE001
                 logger.warning("Groq attempt %d failed: %s", attempt, exc)
