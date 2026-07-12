@@ -154,7 +154,7 @@ class ScheduleRiskEngine:
     # Main analysis
     # ------------------------------------------------------------------
 
-    def analyse(self) -> ScheduleRiskReport:
+    def analyse(self, skip_mitigations: bool = False) -> ScheduleRiskReport:
         report = ScheduleRiskReport()
         critical_ids = self._find_critical_path()
 
@@ -190,9 +190,10 @@ class ScheduleRiskEngine:
         else:
             report.overall_risk = "LOW"
 
-        # Generate mitigations for at-risk tasks
-        for row in report.at_risk:
-            report.mitigations[row["task_id"]] = self._generate_mitigations(row)
+        # Generate mitigations for at-risk tasks (skipped on page load to save API quota)
+        if not skip_mitigations:
+            for row in report.at_risk:
+                report.mitigations[row["task_id"]] = self._generate_mitigations(row)
 
         return report
 

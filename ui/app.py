@@ -203,11 +203,12 @@ def main():
 
         st.divider()
 
-        # Live project status badges
+        # Project status — deterministic only, zero Groq calls on load
         st.markdown("### [==] Project Status")
         compliance_report = agents["compliance"].check_all()
-        schedule_report   = agents["schedule"].analyse()
         supply_summary    = agents["supply"].summary()
+        # Schedule summary is deterministic (risk scoring is math, not LLM)
+        schedule_report   = agents["schedule"].analyse(skip_mitigations=True)
 
         col1, col2 = st.columns(2)
         col1.metric("Open NCRs", compliance_report.summary()["open_ncrs"])
@@ -333,11 +334,18 @@ def main():
                     c3.metric("Lead Time", f"{task['lead_time_days']}d")
                     c4.metric("Buffer", f"{task['buffer_days']}d")
 
-                    mitigations = schedule_report.mitigations.get(task["task_id"], [])
-                    if mitigations:
-                        st.markdown("**Mitigation Options:**")
-                        for i, m in enumerate(mitigations, 1):
-                            st.markdown(f"{i}. {m}")
+                    # Mitigations are generated on-demand only
+                    mit_key = f"mit_{task['task_id']}"
+                    if st.button(f"Generate Mitigations for {task['task_id']}", key=mit_key):
+                        with st.spinner("Generating mitigation options via Groq..."):
+                            full_report = agents["schedule"].analyse(skip_mitigations=False)
+                            mits = full_report.mitigations.get(task["task_id"], [])
+                        if mits:
+                            st.markdown("**Mitigation Options:**")
+                            for i, m in enumerate(mits, 1):
+                                st.markdown(f"{i}. {m}")
+                        else:
+                            st.info("No mitigations generated — check Groq API quota.")
 
         if schedule_report.at_risk:
             st.markdown("#### [M] All At-Risk Tasks")
