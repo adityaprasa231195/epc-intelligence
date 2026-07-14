@@ -1,9 +1,3 @@
-"""
-GroqClient — singleton wrapper around Groq SDK.
-
-Key rule: NEVER sleep/block on 429. Return fallback immediately.
-Sleeping on Streamlit Cloud causes health-check timeout → segfault.
-"""
 import logging
 
 from groq import Groq, RateLimitError
@@ -18,7 +12,6 @@ def _fallback(reason: str) -> dict:
 
 
 class GroqClient:
-    """Singleton Groq wrapper. On 429 — returns fallback instantly, never waits."""
 
     _instance: "GroqClient | None" = None
 
@@ -44,10 +37,6 @@ class GroqClient:
         model: str | None = None,
         system_instruction: str | None = None,
     ) -> dict:
-        """
-        Call Groq once. On ANY error return fallback immediately — no retries, no sleeps.
-        Retrying with sleeps causes Streamlit Cloud health check timeout → segfault.
-        """
         self._init()
         model = model or config.GROQ_TEXT_MODEL
 

@@ -1,9 +1,3 @@
-"""
-Supply Chain Visibility Agent
-
-Loads supplier_locations.json, flags at-risk shipments (eta_days < threshold),
-and uses Gemini to suggest alternative procurement sources.
-"""
 import json
 import os
 import logging
@@ -14,7 +8,6 @@ from core.groq_client import GroqClient
 
 logger = logging.getLogger(__name__)
 
-# Fallback alternative vendor suggestions when Gemini is unavailable
 _FALLBACK_ALTERNATIVES: dict[str, list[str]] = {
     "Generator Set":    ["Cummins India (Pune)", "Kirloskar Electric (Bangalore)", "Caterpillar India (Chennai)"],
     "UPS System":       ["Vertiv India (Pune)", "Schneider Electric (Bangalore)", "Emerson Network (Pune)"],
@@ -32,9 +25,6 @@ _FALLBACK_DEFAULT = ["Contact procurement team for approved vendor list", "Issue
 
 
 class SupplyChainAgent:
-    """
-    Tracks shipment status and surfaces at-risk deliveries.
-    """
 
     def __init__(self) -> None:
         self._groq = GroqClient()
@@ -50,14 +40,7 @@ class SupplyChainAgent:
             self._suppliers = json.load(f)
         logger.info("Loaded %d supplier records", len(self._suppliers))
 
-    # ------------------------------------------------------------------
-    # At-risk detection (deterministic)
-    # ------------------------------------------------------------------
-
     def get_at_risk(self, threshold_days: int = config.RISK_THRESHOLD_DAYS) -> list[dict]:
-        """
-        Return suppliers where shipment is not DELIVERED and eta_days < threshold.
-        """
         return [
             s for s in self._suppliers
             if s["shipment_status"] != "DELIVERED" and s["eta_days"] < threshold_days
@@ -72,15 +55,7 @@ class SupplyChainAgent:
     def get_in_transit(self) -> list[dict]:
         return [s for s in self._suppliers if s["shipment_status"] in ("IN_TRANSIT", "DISPATCHED")]
 
-    # ------------------------------------------------------------------
-    # Alternative sourcing (Gemini + fallback)
-    # ------------------------------------------------------------------
-
     def get_alternatives(self, equipment_type: str, origin_country: str = "India") -> dict[str, Any]:
-        """
-        Ask Groq for alternative procurement options for a given equipment type.
-        Returns structured dict with alternatives list.
-        """
         prompt = (
             f"You are a data centre EPC procurement specialist in {origin_country}.\n"
             f"The primary supplier for '{equipment_type}' is at risk of missing the delivery deadline.\n"
@@ -103,10 +78,6 @@ class SupplyChainAgent:
             "source": "groq",
             "alternatives": result["text"],
         }
-
-    # ------------------------------------------------------------------
-    # Summary
-    # ------------------------------------------------------------------
 
     def summary(self) -> dict[str, int]:
         at_risk = self.get_at_risk()

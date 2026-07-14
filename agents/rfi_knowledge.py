@@ -1,15 +1,3 @@
-"""
-RFI Knowledge Agent
-
-RAG-powered conversational layer over all project RFIs and standards.
-Returns answers with inline citations and surfaces similar past RFIs.
-
-Strategy:
-- Standards questions: inject full standards text directly into Groq context
-  (hash-based embeddings are not semantic; Groq 131K window handles full docs)
-- RFI-specific questions: keyword-match against loaded RFI index directly
-- RAG used only for similarity scoring to surface related RFIs
-"""
 import json
 import os
 import logging
@@ -27,13 +15,10 @@ _NO_RESULT_RESPONSE = (
     "Please escalate to the project engineer or raise a new RFI."
 )
 
-
-# Standards loaded lazily on first query — not at import time
 _STANDARDS_TEXT: str = ""
 
 
 def _get_standards_text() -> str:
-    """Load standards once, cache in module variable."""
     global _STANDARDS_TEXT
     if _STANDARDS_TEXT:
         return _STANDARDS_TEXT
@@ -50,10 +35,6 @@ def _get_standards_text() -> str:
 
 
 class RFIKnowledgeAgent:
-    """
-    Answers technical and contractual queries with citations.
-    Surfaces previously resolved similar RFIs to reduce re-work.
-    """
 
     def __init__(self, rag: RAGEngine) -> None:
         self._rag = rag
@@ -86,17 +67,7 @@ class RFIKnowledgeAgent:
         self._rfi_list = rfis
         logger.info("Loaded and ingested %d RFIs into RAG", len(rfis))
 
-    # ------------------------------------------------------------------
-    # Main query
-    # ------------------------------------------------------------------
-
     def query(self, question: str) -> dict[str, Any]:
-        """
-        Query using full standards text + all RFIs as direct context.
-        Hash embeddings are not semantic so we inject full docs into Groq's
-        131K context window instead of relying on vector retrieval.
-        """
-        # Build full RFI context block
         rfi_block = "\n\n---\n\n".join(
             f"RFI ID: {r['rfi_id']}\n"
             f"Subject: {r['subject']}\n"
@@ -128,18 +99,15 @@ class RFIKnowledgeAgent:
         result = self._groq.generate(prompt)
 
         if result.get("error"):
-            # Fallback: keyword search RFIs directly
             answer = self._keyword_fallback(question)
         else:
             answer = result["text"]
 
-        # Citations from standards files
         citations = [
             {"source": "tia942_excerpts.txt", "score": 1.0},
             {"source": "uptime_tier_concepts.txt", "score": 1.0},
         ]
 
-        # Surface similar resolved RFIs via keyword match
         similar = self._find_similar_rfis_by_keyword(question)
 
         return {
@@ -149,12 +117,7 @@ class RFIKnowledgeAgent:
             "error": False,
         }
 
-    # ------------------------------------------------------------------
-    # Keyword-based RFI fallback (no LLM needed)
-    # ------------------------------------------------------------------
-
     def _keyword_fallback(self, question: str) -> str:
-        """Return best matching RFI resolution when Groq fails."""
         q_words = set(question.lower().split())
         best_rfi = None
         best_score = 0
@@ -172,12 +135,7 @@ class RFIKnowledgeAgent:
             )
         return _NO_RESULT_RESPONSE
 
-    # ------------------------------------------------------------------
-    # Similar RFI detection by keyword
-    # ------------------------------------------------------------------
-
     def _find_similar_rfis_by_keyword(self, question: str) -> list[dict]:
-        """Keyword overlap match against RFI subjects and questions."""
         q_words = set(question.lower().split())
         scored = []
         for rfi in self._rfi_list:

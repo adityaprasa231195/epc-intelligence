@@ -1,9 +1,3 @@
-"""
-Orchestrator Agent
-
-Keyword-first routing → Gemini classification fallback.
-Dispatches queries to the correct specialist agent and returns structured results.
-"""
 import logging
 from typing import Any
 
@@ -12,7 +6,6 @@ from rag.rag_engine import RAGEngine
 
 logger = logging.getLogger(__name__)
 
-# Keyword → agent key mapping (deterministic, fastest path)
 _KEYWORD_MAP: dict[str, list[str]] = {
     "compliance": ["spec", "specification", "deviation", "ncr", "non-conformance", "submittal",
                    "drawing", "vendor", "procurement", "quality", "compliant", "requirement"],
@@ -30,7 +23,6 @@ _AGENT_KEYS = ["compliance", "schedule", "supply_chain", "commissioning", "rfi"]
 
 
 def _keyword_classify(query: str) -> str | None:
-    """Return agent key if a strong keyword match is found, else None."""
     lower = query.lower()
     scores: dict[str, int] = {k: 0 for k in _AGENT_KEYS}
     for agent_key, keywords in _KEYWORD_MAP.items():
@@ -42,15 +34,11 @@ def _keyword_classify(query: str) -> str | None:
 
 
 class OrchestratorAgent:
-    """
-    Routes user queries to the correct specialist agent.
-    All 5 agents are initialised lazily on first use.
-    """
 
     def __init__(self, rag: RAGEngine) -> None:
         self._rag = rag
         self._groq = GroqClient()
-        self._agents: dict[str, Any] = {}   # populated on first access
+        self._agents: dict[str, Any] = {}
 
     def _get_agent(self, key: str) -> Any:
         if key not in self._agents:
@@ -58,7 +46,6 @@ class OrchestratorAgent:
         return self._agents[key]
 
     def _build_agent(self, key: str) -> Any:
-        # Late imports to avoid circular dependencies
         if key == "compliance":
             from agents.spec_compliance import SpecComplianceAgent
             return SpecComplianceAgent(rag=self._rag)
@@ -76,12 +63,7 @@ class OrchestratorAgent:
             return RFIKnowledgeAgent(rag=self._rag)
         raise ValueError(f"Unknown agent key: {key}")
 
-    # ------------------------------------------------------------------
-    # Routing
-    # ------------------------------------------------------------------
-
     def _gemini_classify(self, query: str) -> str:
-        """Ask Groq to classify an ambiguous query. Returns agent key."""
         prompt = (
             "Classify the following data centre EPC project query into exactly one category.\n"
             "Categories: compliance, schedule, supply_chain, commissioning, rfi\n\n"
@@ -96,31 +78,17 @@ class OrchestratorAgent:
         )
         result = self._groq.generate(prompt)
         if result.get("error"):
-            return "rfi"  # safest default
+            return "rfi"
         classification = result["text"].strip().lower()
-        # Validate the response is one of the known keys
         for key in _AGENT_KEYS:
             if key in classification:
                 return key
         return "rfi"
 
     def route(self, query: str) -> dict[str, Any]:
-        """
-        Classify the query and dispatch to the correct agent.
-
-        Returns:
-          {
-            "agent_used": str,
-            "classification_method": "keyword" | "gemini" | "fallback",
-            "result": <agent output>,
-            "error": bool
-          }
-        """
-        # Step 1: Keyword classification (fastest)
         agent_key = _keyword_classify(query)
         method = "keyword"
 
-        # Step 2: Groq classification if ambiguous
         if agent_key is None:
             agent_key = self._gemini_classify(query)
             method = "groq"
@@ -136,7 +104,7 @@ class OrchestratorAgent:
                 "result": result,
                 "error": False,
             }
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.error("Agent '%s' failed: %s", agent_key, exc)
             return {
                 "agent_used": agent_key,
@@ -146,9 +114,7 @@ class OrchestratorAgent:
             }
 
     def _dispatch(self, key: str, agent: Any, query: str) -> Any:
-        """Call the appropriate method on each agent for a free-text query."""
         if key == "compliance":
-            # Run full compliance check and return summary + top deviations
             report = agent.check_all()
             return {
                 "summary": report.summary(),
@@ -179,7 +145,6 @@ class OrchestratorAgent:
                 result["alternatives"] = agent.get_alternatives(at_risk[0]["equipment_type"])
             return result
         if key == "commissioning":
-            # Extract system type from query or default to "power"
             system = _extract_system_type(query)
             checklist = agent.get_test_sequence(system)
             return {"system_type": system, "checklist": checklist}
@@ -189,7 +154,6 @@ class OrchestratorAgent:
 
 
 def _extract_system_type(query: str) -> str:
-    """Extract system type keyword from query for commissioning agent."""
     lower = query.lower()
     for sys in ["cooling", "power", "network", "fire", "electrical"]:
         if sys in lower:

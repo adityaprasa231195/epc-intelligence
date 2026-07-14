@@ -1,9 +1,3 @@
-"""
-Commissioning QA Copilot
-
-RAG-powered agent grounded in TIA-942 and Uptime Institute Tier standards.
-Guides engineers through test sequences, validates results, and generates test records.
-"""
 import logging
 from dataclasses import dataclass, field
 from datetime import date
@@ -14,7 +8,6 @@ from rag.rag_engine import RAGEngine
 
 logger = logging.getLogger(__name__)
 
-# Hardcoded fallback checklists when RAG returns empty
 _FALLBACK_CHECKLISTS: dict[str, list[dict]] = {
     "power": [
         {"step": 1, "description": "Verify earthing resistance < 1 ohm (IS 3043)", "acceptance": "< 1 ohm"},
@@ -59,7 +52,7 @@ class TestResult:
     description: str
     acceptance: str
     measured_value: str = ""
-    status: str = "PENDING"  # PENDING / PASS / FAIL
+    status: str = "PENDING"
     notes: str = ""
 
 
@@ -90,29 +83,16 @@ class TestRecord:
 
 
 class CommissioningQACopilot:
-    """
-    Commissioning QA agent grounded in TIA-942 / Uptime Institute standards.
-    """
 
     def __init__(self, rag: RAGEngine) -> None:
         self._rag = rag
         self._groq = GroqClient()
 
-    # ------------------------------------------------------------------
-    # Test sequence retrieval
-    # ------------------------------------------------------------------
-
     def get_test_sequence(self, system_type: str) -> list[dict]:
-        """
-        Retrieve RAG-grounded test checklist for a system type.
-        Falls back to hardcoded checklist if RAG is empty or unhelpful.
-        """
-        system_key = system_type.lower().split()[0]  # "cooling system" → "cooling"
+        system_key = system_type.lower().split()[0]
 
-        # Try RAG first
         chunks = self._rag.query(f"commissioning test sequence {system_type} steps procedure")
         if chunks and chunks[0]["score"] > 0.3:
-            # Ask Groq to structure the retrieved context into a checklist
             context = "\n\n".join(c["chunk"] for c in chunks[:3])
             prompt = (
                 f"Based on the following commissioning standards excerpts, generate a numbered test checklist "
@@ -123,32 +103,20 @@ class CommissioningQACopilot:
             )
             result = self._groq.generate(prompt)
             if not result.get("error"):
-                # Parse the LLM output into structured steps
                 steps = _parse_rag_checklist(result["text"], chunks)
                 if steps:
                     return steps
 
-        # Fallback to hardcoded checklist
         logger.info("RAG unavailable or low score — using fallback checklist for '%s'", system_key)
         return _FALLBACK_CHECKLISTS.get(system_key, _FALLBACK_CHECKLISTS["power"])
-
-    # ------------------------------------------------------------------
-    # Test result validation (deterministic)
-    # ------------------------------------------------------------------
 
     def validate_test_result(
         self, description: str, measured_value: str, acceptance_criteria: str
     ) -> dict[str, str]:
-        """
-        Simple deterministic validator — checks if measured value satisfies criteria.
-        Returns {"status": "PASS" | "FAIL" | "MANUAL_REVIEW", "reason": str}
-        """
-        # Numeric comparison: extract numbers and compare
         measured_num = _extract_number(measured_value)
         criteria_parts = acceptance_criteria.strip()
 
         if measured_num is not None:
-            # Handle comparison operators in criteria
             if criteria_parts.startswith("<"):
                 threshold = _extract_number(criteria_parts)
                 if threshold is not None:
@@ -160,7 +128,6 @@ class CommissioningQACopilot:
                     status = "PASS" if measured_num > threshold else "FAIL"
                     return {"status": status, "reason": f"{measured_num} {'>' if status == 'PASS' else '≤'} {threshold}"}
             elif "–" in criteria_parts or "-" in criteria_parts:
-                # Range check
                 parts = criteria_parts.replace("–", "-").split("-")
                 if len(parts) == 2:
                     lo = _extract_number(parts[0])
@@ -169,7 +136,6 @@ class CommissioningQACopilot:
                         status = "PASS" if lo <= measured_num <= hi else "FAIL"
                         return {"status": status, "reason": f"{measured_num} {'in' if status == 'PASS' else 'outside'} range {lo}–{hi}"}
 
-        # String-based pass/fail keywords
         lower_val = measured_value.lower()
         if any(k in lower_val for k in ("pass", "ok", "confirmed", "compliant", "yes")):
             return {"status": "PASS", "reason": "Observed result indicates pass"}
@@ -178,10 +144,6 @@ class CommissioningQACopilot:
 
         return {"status": "MANUAL_REVIEW", "reason": "Cannot auto-determine pass/fail — requires engineer review"}
 
-    # ------------------------------------------------------------------
-    # Test record generation
-    # ------------------------------------------------------------------
-
     def generate_test_record(
         self,
         system_type: str,
@@ -189,7 +151,6 @@ class CommissioningQACopilot:
         project_name: str = "Data Centre EPC Project",
         tester: str = "Site Engineer",
     ) -> TestRecord:
-        """Create a structured TestRecord from a list of TestResult objects."""
         import uuid
         record = TestRecord(
             record_id=f"TR-{system_type.upper()[:4]}-{uuid.uuid4().hex[:6].upper()}",
@@ -202,10 +163,6 @@ class CommissioningQACopilot:
         return record
 
     def format_test_record_text(self, record: TestRecord) -> str:
-        """
-        Ask Gemini to format a TestRecord as a professional document string.
-        Falls back to a plain-text template if Gemini fails.
-        """
         results_text = "\n".join(
             f"Step {r.step}: {r.description} | Acceptance: {r.acceptance} | "
             f"Measured: {r.measured_value or 'N/A'} | Status: {r.status}"
@@ -229,22 +186,15 @@ class CommissioningQACopilot:
         return result["text"]
 
 
-# ------------------------------------------------------------------
-# Helpers
-# ------------------------------------------------------------------
-
 def _extract_number(s: str) -> float | None:
-    """Extract the first numeric value from a string."""
     import re
     m = re.search(r"[\d]+\.?[\d]*", s)
     return float(m.group()) if m else None
 
 
 def _parse_rag_checklist(text: str, chunks: list[dict]) -> list[dict]:
-    """Parse Gemini-generated numbered checklist into step dicts."""
     import re
     steps = []
-    # Match "Step N:" or "N." patterns
     pattern = r"(?:Step\s*)?(\d+)[:.]\s*(.+?)(?:\|\s*Acceptance Criteria:\s*(.+?))?(?=\n(?:Step\s*)?\d+[:.]|\Z)"
     for match in re.finditer(pattern, text, re.DOTALL):
         step_num = int(match.group(1))

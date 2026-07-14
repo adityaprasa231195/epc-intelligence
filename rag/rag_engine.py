@@ -1,9 +1,3 @@
-"""
-RAGEngine — Pure Python in-memory store (no ChromaDB).
-
-Replaces ChromaDB to avoid segfaults on Streamlit Cloud Linux environment.
-Uses keyword overlap scoring — sufficient since RFI agent uses full-context injection.
-"""
 import os
 import uuid
 import logging
@@ -16,7 +10,6 @@ logger = logging.getLogger(__name__)
 
 
 def _keyword_score(query: str, chunk: str) -> float:
-    """BM25-style term overlap score."""
     q_terms = set(query.lower().split())
     c_terms = set(chunk.lower().split())
     if not q_terms:
@@ -25,19 +18,10 @@ def _keyword_score(query: str, chunk: str) -> float:
 
 
 class RAGEngine:
-    """
-    Pure Python in-memory document store with keyword search.
-    No external dependencies — zero crash risk on any platform.
-    """
 
     def __init__(self) -> None:
-        # Simple list of {id, document, source}
         self._store: list[dict] = []
         logger.info("RAGEngine initialised (pure Python in-memory store)")
-
-    # ------------------------------------------------------------------
-    # Chunking
-    # ------------------------------------------------------------------
 
     @staticmethod
     def _chunk(
@@ -52,12 +36,7 @@ class RAGEngine:
             start += size - overlap
         return [c for c in chunks if c]
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
-
     def ingest(self, text: str, source_label: str) -> int:
-        """Chunk and store text. Returns number of chunks stored."""
         chunks = self._chunk(text)
         for chunk in chunks:
             self._store.append({
@@ -69,7 +48,6 @@ class RAGEngine:
         return len(chunks)
 
     def ingest_file(self, filepath: str, source_label: str | None = None) -> int:
-        """Read a .txt or .pdf file and ingest it."""
         label = source_label or os.path.basename(filepath)
         ext = os.path.splitext(filepath)[1].lower()
         if ext == ".pdf":
@@ -88,9 +66,6 @@ class RAGEngine:
         return self.ingest(text, label)
 
     def query(self, question: str, top_k: int = config.RAG_TOP_K) -> list[dict[str, Any]]:
-        """
-        Keyword overlap search. Returns top-k results sorted by score.
-        """
         if not self._store:
             return []
         scored = [

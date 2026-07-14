@@ -1,19 +1,11 @@
-"""
-EPC Intelligence Platform — Streamlit UI
-Entry point: streamlit run ui/app.py (from epc-intelligence/ directory)
-"""
 import os
 import sys
 import logging
 
-# Ensure project root is on path when run from ui/ or project root
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import streamlit as st
 
-# ------------------------------------------------------------------
-# Page config (must be first Streamlit call)
-# ------------------------------------------------------------------
 st.set_page_config(
     page_title="EPC Intelligence Platform",
     page_icon="[DC]",
@@ -21,19 +13,13 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Minimal imports at module level — all heavy imports inside init_platform()
 import config
 
 logging.basicConfig(level=logging.WARNING)
 
-# ------------------------------------------------------------------
-# Session state initialisation (agents load once per session)
-# ------------------------------------------------------------------
 
 @st.cache_resource(show_spinner="Initialising platform...")
 def init_platform():
-    """Load all agents once and cache for the session. Zero Groq calls here."""
-    # All heavy imports here — not at module level — saves RAM on startup
     from rag.rag_engine import RAGEngine
     from agents.spec_compliance import SpecComplianceAgent
     from agents.schedule_risk import ScheduleRiskEngine
@@ -47,7 +33,6 @@ def init_platform():
 
     rag = RAGEngine()
 
-    # Ingest standards — pure file I/O, no Groq
     if rag.collection_count() < 10:
         for fname in os.listdir(config.STANDARDS_DIR):
             if fname.endswith(".txt"):
@@ -79,7 +64,6 @@ def _status_badge(status: str) -> str:
 
 
 def _render_orchestrator_result(agent_key: str, result: dict, agents: dict, query: str) -> None:
-    """Render orchestrator result as clean natural language instead of raw JSON."""
     from core.groq_client import GroqClient
     groq = GroqClient()
 
@@ -146,7 +130,6 @@ def _render_orchestrator_result(agent_key: str, result: dict, agents: dict, quer
                 st.caption(f"> {r['rfi_id']} — {r['subject']}")
 
     else:
-        # Fallback: ask Groq to summarise whatever came back
         prompt = (
             f"Summarise the following data centre EPC project analysis result "
             f"in 2-3 plain English sentences for a project manager. "
@@ -159,14 +142,9 @@ def _render_orchestrator_result(agent_key: str, result: dict, agents: dict, quer
             st.json(result, expanded=False)
 
 
-# ------------------------------------------------------------------
-# Main app
-# ------------------------------------------------------------------
-
 def main():
     agents, error = init_platform()
 
-    # Header
     st.markdown("## [DC] EPC Intelligence Platform")
     st.markdown("*AI-powered project intelligence for Data Centre construction*")
     st.divider()
@@ -176,9 +154,6 @@ def main():
         st.info("Set your `GROQ_API_KEY` in a `.env` file in the project root and restart.")
         st.stop()
 
-    # ------------------------------------------------------------------
-    # Sidebar — Orchestrator query bar
-    # ------------------------------------------------------------------
     with st.sidebar:
         st.markdown("### [AI] Ask the Orchestrator")
         st.caption("Ask anything — the AI routes your query to the right agent automatically.")
@@ -205,7 +180,6 @@ def main():
 
         st.divider()
 
-        # Project status — computed once per session, never on every rerun
         st.markdown("### [==] Project Status")
         if "project_stats" not in st.session_state:
             _cr = agents["compliance"].check_all()
@@ -228,10 +202,6 @@ def main():
         col1.metric("Schedule Risk", _stats["schedule_risk"])
         col2.metric("Critical Violations", _stats["critical_violations"])
 
-    # ------------------------------------------------------------------
-    # Main tabs
-    # ------------------------------------------------------------------
-    # Pull reports from session state — computed once, never recomputed on reruns
     compliance_report = st.session_state.get("compliance_report") or agents["compliance"].check_all()
     schedule_report   = st.session_state.get("schedule_report")   or agents["schedule"].analyse(skip_mitigations=True)
 
@@ -243,9 +213,6 @@ def main():
         "[?] RFI Intelligence",
     ])
 
-    # ================================================================
-    # TAB 1 — Spec & Quality Compliance
-    # ================================================================
     with tab1:
         st.markdown("### Specification & Quality Compliance Agent")
         st.caption("Automated procurement compliance check against project specifications.")
@@ -280,7 +247,6 @@ def main():
 
         st.divider()
 
-        # NCR log table
         if compliance_report.ncr_log:
             st.markdown("#### [#] NCR Audit Log")
             ncr_data = [
@@ -298,7 +264,6 @@ def main():
             st.dataframe(ncr_data, use_container_width=True)
 
         st.divider()
-        # Drawing upload
         st.markdown("#### [IMG] Drawing / Submittal Analysis (Vision AI)")
         st.caption("Upload an equipment drawing or vendor submittal. Analysed by Llama 4 Scout vision model against TIA-942 / Tier III standards.")
         uploaded = st.file_uploader(
@@ -317,13 +282,11 @@ def main():
                     st.caption(f"Analysed by: `{model_used}`")
                     st.markdown(f"**Review: `{result['filename']}`**")
                     st.code(result["analysis"], language=None)
-                    # Store in session state so download persists
                     st.session_state["drawing_review"] = result["analysis"]
                     st.session_state["drawing_filename"] = result["filename"]
             else:
                 st.info("PDF drawing analysis: requires manual review.")
 
-        # Download always visible once a review exists
         if st.session_state.get("drawing_review"):
             st.download_button(
                 "[DN] Download Review",
@@ -333,9 +296,6 @@ def main():
                 key="download_drawing_review",
             )
 
-    # ================================================================
-    # TAB 2 — Schedule Risk Engine
-    # ================================================================
     with tab2:
         st.markdown("### Predictive Schedule Risk Engine")
         st.caption("CPM-based risk detection with Groq-generated mitigation options.")
@@ -357,7 +317,6 @@ def main():
                     c3.metric("Lead Time", f"{task['lead_time_days']}d")
                     c4.metric("Buffer", f"{task['buffer_days']}d")
 
-                    # Mitigations are generated on-demand only
                     mit_key = f"mit_{task['task_id']}"
                     if st.button(f"Generate Mitigations for {task['task_id']}", key=mit_key):
                         with st.spinner("Generating mitigation options via Groq..."):
@@ -395,9 +354,6 @@ def main():
                 ]
                 st.dataframe(on_track_table, use_container_width=True)
 
-    # ================================================================
-    # TAB 3 — Supply Chain Visibility
-    # ================================================================
     with tab3:
         st.markdown("### Supply Chain Visibility Agent")
         st.caption("Real-time shipment tracking with geospatial map and alternative sourcing.")
@@ -406,14 +362,12 @@ def main():
         at_risk = agents["supply"].get_at_risk()
         summary = agents["supply"].summary()
 
-        # KPI row
         k1, k2, k3, k4 = st.columns(4)
         k1.metric("Total Suppliers", summary["total_suppliers"])
         k2.metric("Delivered", summary["delivered"])
         k3.metric("In Transit / Dispatched", summary["in_transit"])
         k4.metric("AT RISK", summary["at_risk"], delta=f"-{summary['at_risk']} deliveries" if summary["at_risk"] else None, delta_color="inverse")
 
-        # Supplier location table (st.map removed — pydeck native C causes segfault on Cloud)
         st.markdown("#### [MAP] Supplier Locations")
         loc_table = [
             {
@@ -428,7 +382,6 @@ def main():
         ]
         st.dataframe(loc_table, use_container_width=True)
 
-        # At-risk table
         if at_risk:
             st.markdown("#### [!] At-Risk Deliveries")
             for s in at_risk:
@@ -451,7 +404,6 @@ def main():
                         else:
                             st.text(alt["alternatives"])
 
-        # Full shipment table
         st.markdown("#### [BOX] All Shipments")
         ship_table = [
             {
@@ -466,9 +418,6 @@ def main():
         ]
         st.dataframe(ship_table, use_container_width=True)
 
-    # ================================================================
-    # TAB 4 — Commissioning QA
-    # ================================================================
     with tab4:
         st.markdown("### Commissioning QA Copilot")
         st.caption("TIA-942 and Uptime Institute Tier III grounded test sequences with auto-generated test records.")
@@ -526,7 +475,6 @@ def main():
                         }
                         st.session_state["test_results"] = test_results
 
-            # Generate test record button
             if test_results:
                 st.divider()
                 tester_name = st.text_input("Tester name:", value="Site Engineer", key="tester")
@@ -549,12 +497,10 @@ def main():
                             system_type, results_objs, project_name, tester_name
                         )
                         doc_text = agents["commissioning"].format_test_record_text(record)
-                    # Store in session state so download button persists across reruns
                     st.session_state["test_record_doc"] = doc_text
                     st.session_state["test_record_id"] = record.record_id
                     st.session_state["test_record_status"] = record.overall_status
 
-                # Download button always visible once doc is generated
                 if st.session_state.get("test_record_doc"):
                     doc_text = st.session_state["test_record_doc"]
                     record_id = st.session_state["test_record_id"]
@@ -569,18 +515,13 @@ def main():
                         key="download_test_record",
                     )
 
-    # ================================================================
-    # TAB 5 — RFI Intelligence
-    # ================================================================
     with tab5:
         st.markdown("### Project Knowledge & RFI Intelligence Agent")
         st.caption("RAG-powered search over all project RFIs and commissioning standards. Answers with citations.")
 
-        # Chat history
         if "rfi_history" not in st.session_state:
             st.session_state["rfi_history"] = []
 
-        # Display chat history
         for msg in st.session_state["rfi_history"]:
             with st.chat_message(msg["role"]):
                 st.markdown(msg["content"])
@@ -597,7 +538,6 @@ def main():
                                 f"*Clause: {rfi['related_clause']}*"
                             )
 
-        # Input
         user_q = st.chat_input("Ask about specs, RFIs, standards, or project documents...")
         if user_q:
             st.session_state["rfi_history"].append({"role": "user", "content": user_q})
@@ -632,7 +572,6 @@ def main():
                 "similar_rfis": result.get("similar_rfis", []),
             })
 
-        # Quick query buttons
         st.divider()
         st.caption("Quick queries:")
         q_cols = st.columns(3)

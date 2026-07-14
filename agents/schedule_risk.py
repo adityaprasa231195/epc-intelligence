@@ -1,12 +1,3 @@
-"""
-Predictive Schedule Risk Engine
-
-Deterministic CPM-style analysis:
-  risk_score = max(0, lead_time_days - buffer_days)
-  delay_days  = max(0, actual_start - planned_start)
-
-Gemini generates mitigation narratives for at-risk tasks.
-"""
 import json
 import os
 import logging
@@ -19,7 +10,6 @@ from core.groq_client import GroqClient
 
 logger = logging.getLogger(__name__)
 
-# Pre-written mitigation templates keyed by category — used as Gemini fallback
 _MITIGATION_FALLBACK: dict[str, list[str]] = {
     "Generator": [
         "Expedite factory testing and arrange express freight shipment.",
@@ -103,7 +93,6 @@ def _equipment_category(name: str) -> str:
 
 
 class ScheduleRiskEngine:
-    """Deterministic schedule risk analyser + LLM mitigation generator."""
 
     def __init__(self) -> None:
         self._groq = GroqClient()
@@ -133,26 +122,13 @@ class ScheduleRiskEngine:
             )
         logger.info("Loaded %d schedule tasks", len(self._tasks))
 
-    # ------------------------------------------------------------------
-    # Critical path detection (zero-float tasks)
-    # ------------------------------------------------------------------
-
     def _find_critical_path(self) -> set[str]:
-        """
-        Tasks whose delay directly causes the project end-date to slip.
-        Simplified: tasks with DELAYED status that appear in others' dependency chains.
-        """
         delayed_ids = {t.task_id for t in self._tasks if t.status == "DELAYED"}
-        # find tasks whose dependencies include a delayed task
         critical: set[str] = set(delayed_ids)
         for t in self._tasks:
             if any(dep in delayed_ids for dep in t.dependencies):
                 critical.add(t.task_id)
         return critical
-
-    # ------------------------------------------------------------------
-    # Main analysis
-    # ------------------------------------------------------------------
 
     def analyse(self, skip_mitigations: bool = False) -> ScheduleRiskReport:
         report = ScheduleRiskReport()
@@ -182,7 +158,6 @@ class ScheduleRiskEngine:
             else:
                 report.on_track.append(row)
 
-        # Determine overall risk level
         if report.critical_path_violations:
             report.overall_risk = "HIGH"
         elif len(report.at_risk) > 3:
@@ -190,16 +165,11 @@ class ScheduleRiskEngine:
         else:
             report.overall_risk = "LOW"
 
-        # Generate mitigations for at-risk tasks (skipped on page load to save API quota)
         if not skip_mitigations:
             for row in report.at_risk:
                 report.mitigations[row["task_id"]] = self._generate_mitigations(row)
 
         return report
-
-    # ------------------------------------------------------------------
-    # Mitigation generation (Gemini + deterministic fallback)
-    # ------------------------------------------------------------------
 
     def _generate_mitigations(self, task_row: dict) -> list[str]:
         prompt = (
@@ -217,14 +187,12 @@ class ScheduleRiskEngine:
             category = _equipment_category(task_row["name"])
             return _MITIGATION_FALLBACK.get(category, _MITIGATION_FALLBACK["Default"])
 
-        # Parse dash-separated list from Groq response
         lines = [
             line.lstrip("- ").strip()
             for line in result["text"].splitlines()
             if line.strip().startswith("-")
         ]
         if not lines:
-            # Fallback if Groq didn't format with dashes
             category = _equipment_category(task_row["name"])
             return _MITIGATION_FALLBACK.get(category, _MITIGATION_FALLBACK["Default"])
         return lines[:3]

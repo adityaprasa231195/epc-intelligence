@@ -1,10 +1,3 @@
-"""
-Spec & Quality Compliance Agent
-
-Checks procurement items against specification requirements.
-Flags deviations and builds an NCR (Non-Conformance Report) log.
-Optionally uses Gemini Vision to analyse uploaded drawings/submittals.
-"""
 import csv
 import os
 import logging
@@ -60,9 +53,6 @@ class ComplianceReport:
 
 
 class SpecComplianceAgent:
-    """
-    Loads procurement_items.csv and checks each item for spec compliance.
-    """
 
     def __init__(self, rag: RAGEngine | None = None) -> None:
         self._groq = GroqClient()
@@ -80,15 +70,7 @@ class SpecComplianceAgent:
             self._items = list(reader)
         logger.info("Loaded %d procurement items", len(self._items))
 
-    # ------------------------------------------------------------------
-    # Core compliance check (deterministic)
-    # ------------------------------------------------------------------
-
     def _check_item(self, item: dict) -> tuple[bool, str]:
-        """
-        Returns (is_compliant, reason).
-        Comparison is string-exact — spec values are normalised.
-        """
         spec = item["spec_requirement"].strip()
         submitted = item["vendor_submitted_value"].strip()
         if spec == submitted:
@@ -96,7 +78,6 @@ class SpecComplianceAgent:
         return False, f"Spec requires '{spec}' but vendor submitted '{submitted}'"
 
     def check_all(self) -> ComplianceReport:
-        """Run compliance check on all loaded procurement items."""
         report = ComplianceReport()
         ncr_counter = 1
 
@@ -132,7 +113,6 @@ class SpecComplianceAgent:
         return report
 
     def check_item_by_id(self, item_id: str) -> dict[str, Any]:
-        """Check a single item by its PROC-xxx ID."""
         for item in self._items:
             if item["item_id"] == item_id:
                 is_compliant, reason = self._check_item(item)
@@ -144,24 +124,13 @@ class SpecComplianceAgent:
                 }
         return {"error": True, "reason": f"Item {item_id} not found"}
 
-    # ------------------------------------------------------------------
-    # Gemini Vision — drawing / submittal analysis
-    # ------------------------------------------------------------------
-
     def analyse_drawing(self, image_bytes: bytes, filename: str = "drawing") -> dict[str, Any]:
-        """
-        Analyse a vendor submittal or drawing using Groq Llama 4 Scout vision.
-        Sends the actual image as base64 to the vision model.
-        Falls back to filename-based analysis if vision call fails.
-        """
         import base64, mimetypes
 
-        # Detect mime type from filename
         mime_type, _ = mimetypes.guess_type(filename)
         if mime_type not in ("image/png", "image/jpeg", "image/webp", "image/gif"):
             mime_type = "image/png"
 
-        # Encode image to base64
         b64_image = base64.standard_b64encode(image_bytes).decode("utf-8")
 
         system_prompt = (
@@ -222,7 +191,6 @@ class SpecComplianceAgent:
                 if attempt < 2:
                     time.sleep(2)
 
-        # Fallback: filename-based Groq analysis (no vision)
         fname_lower = filename.lower()
         equipment_hints = []
         for kw, label in [
@@ -256,12 +224,7 @@ class SpecComplianceAgent:
             "model": "llama-3.3-70b (filename fallback)",
         }
 
-    # ------------------------------------------------------------------
-    # LLM-enhanced NCR narrative
-    # ------------------------------------------------------------------
-
     def generate_ncr_narrative(self, ncr: NCR) -> str:
-        """Ask Groq to write a formal NCR description for an NCR object."""
         prompt = (
             f"Write a formal Non-Conformance Report (NCR) narrative for a data centre EPC project.\n"
             f"Item: {ncr.name} ({ncr.item_id})\n"
@@ -274,7 +237,6 @@ class SpecComplianceAgent:
         )
         result = self._groq.generate(prompt)
         if result.get("error"):
-            # Deterministic fallback
             return (
                 f"NCR {ncr.ncr_id}: {ncr.name} submitted with {ncr.vendor_submitted_value} {ncr.unit} "
                 f"against specification requirement of {ncr.spec_requirement} {ncr.unit}. "
