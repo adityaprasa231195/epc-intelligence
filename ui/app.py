@@ -315,14 +315,21 @@ def main():
                     st.caption(f"Analysed by: `{model_used}`")
                     st.markdown(f"**Review: `{result['filename']}`**")
                     st.code(result["analysis"], language=None)
-                    st.download_button(
-                        "[DN] Download Review",
-                        data=result["analysis"],
-                        file_name=f"review_{uploaded.name}.txt",
-                        mime="text/plain",
-                    )
+                    # Store in session state so download persists
+                    st.session_state["drawing_review"] = result["analysis"]
+                    st.session_state["drawing_filename"] = result["filename"]
             else:
                 st.info("PDF drawing analysis: requires manual review.")
+
+        # Download always visible once a review exists
+        if st.session_state.get("drawing_review"):
+            st.download_button(
+                "[DN] Download Review",
+                data=st.session_state["drawing_review"],
+                file_name=f"review_{st.session_state['drawing_filename']}.txt",
+                mime="text/plain",
+                key="download_drawing_review",
+            )
 
     # ================================================================
     # TAB 2 — Schedule Risk Engine
@@ -530,14 +537,24 @@ def main():
                             system_type, results_objs, project_name, tester_name
                         )
                         doc_text = agents["commissioning"].format_test_record_text(record)
+                    # Store in session state so download button persists across reruns
+                    st.session_state["test_record_doc"] = doc_text
+                    st.session_state["test_record_id"] = record.record_id
+                    st.session_state["test_record_status"] = record.overall_status
 
-                    st.success(f"Test Record **{record.record_id}** generated — Overall: {record.overall_status}")
+                # Download button always visible once doc is generated
+                if st.session_state.get("test_record_doc"):
+                    doc_text = st.session_state["test_record_doc"]
+                    record_id = st.session_state["test_record_id"]
+                    record_status = st.session_state["test_record_status"]
+                    st.success(f"Test Record **{record_id}** generated — Overall: {record_status}")
                     st.text_area("Test Record Document:", doc_text, height=400, key="test_record_output")
                     st.download_button(
                         "[DN] Download Test Record",
                         data=doc_text,
-                        file_name=f"{record.record_id}.txt",
+                        file_name=f"{record_id}.txt",
                         mime="text/plain",
+                        key="download_test_record",
                     )
 
     # ================================================================
