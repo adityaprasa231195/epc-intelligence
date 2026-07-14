@@ -28,8 +28,15 @@ _NO_RESULT_RESPONSE = (
 )
 
 
-def _load_standards_text() -> str:
-    """Load all standards files into a single string for direct context injection."""
+# Standards loaded lazily on first query — not at import time
+_STANDARDS_TEXT: str = ""
+
+
+def _get_standards_text() -> str:
+    """Load standards once, cache in module variable."""
+    global _STANDARDS_TEXT
+    if _STANDARDS_TEXT:
+        return _STANDARDS_TEXT
     parts = []
     if not os.path.exists(config.STANDARDS_DIR):
         return ""
@@ -38,11 +45,8 @@ def _load_standards_text() -> str:
             fpath = os.path.join(config.STANDARDS_DIR, fname)
             with open(fpath, encoding="utf-8") as f:
                 parts.append(f.read())
-    return "\n\n===\n\n".join(parts)
-
-
-# Load once at import time — standards are static
-_STANDARDS_TEXT = _load_standards_text()
+    _STANDARDS_TEXT = "\n\n===\n\n".join(parts)
+    return _STANDARDS_TEXT
 
 
 class RFIKnowledgeAgent:
@@ -105,7 +109,7 @@ class RFIKnowledgeAgent:
 
         context_block = (
             "=== DATA CENTRE STANDARDS (TIA-942, Uptime Institute) ===\n\n"
-            + _STANDARDS_TEXT
+            + _get_standards_text()
             + "\n\n=== PROJECT RFI LOG ===\n\n"
             + rfi_block
         )

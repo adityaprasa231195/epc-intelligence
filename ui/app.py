@@ -21,14 +21,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# Minimal imports at module level — all heavy imports inside init_platform()
 import config
-from rag.rag_engine import RAGEngine
-from agents.spec_compliance import SpecComplianceAgent
-from agents.schedule_risk import ScheduleRiskEngine
-from agents.supply_chain import SupplyChainAgent
-from agents.commissioning_qa import CommissioningQACopilot, TestResult
-from agents.rfi_knowledge import RFIKnowledgeAgent
-from agents.orchestrator import OrchestratorAgent
 
 logging.basicConfig(level=logging.WARNING)
 
@@ -39,6 +33,15 @@ logging.basicConfig(level=logging.WARNING)
 @st.cache_resource(show_spinner="Initialising platform...")
 def init_platform():
     """Load all agents once and cache for the session. Zero Groq calls here."""
+    # All heavy imports here — not at module level — saves RAM on startup
+    from rag.rag_engine import RAGEngine
+    from agents.spec_compliance import SpecComplianceAgent
+    from agents.schedule_risk import ScheduleRiskEngine
+    from agents.supply_chain import SupplyChainAgent
+    from agents.commissioning_qa import CommissioningQACopilot
+    from agents.rfi_knowledge import RFIKnowledgeAgent
+    from agents.orchestrator import OrchestratorAgent
+
     if not config.GROQ_API_KEY:
         return None, "GROQ_API_KEY not set. Please add it to Streamlit Cloud secrets."
 
@@ -51,7 +54,6 @@ def init_platform():
                 fpath = os.path.join(config.STANDARDS_DIR, fname)
                 rag.ingest_file(fpath, source_label=fname)
 
-    # Agents are created here — GroqClient() instantiated but NOT called
     agents = {
         "compliance":    SpecComplianceAgent(rag=rag),
         "schedule":      ScheduleRiskEngine(),
@@ -522,6 +524,7 @@ def main():
                 project_name = st.text_input("Project name:", value="Mumbai Data Centre EPC", key="project")
 
                 if st.button("[DOC] Generate Test Record Document", type="primary"):
+                    from agents.commissioning_qa import TestResult
                     results_objs = [
                         TestResult(
                             step=v["step"],
