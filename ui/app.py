@@ -413,11 +413,20 @@ def main():
         k3.metric("In Transit / Dispatched", summary["in_transit"])
         k4.metric("AT RISK", summary["at_risk"], delta=f"-{summary['at_risk']} deliveries" if summary["at_risk"] else None, delta_color="inverse")
 
-        # Map
+        # Supplier location table (st.map removed — pydeck native C causes segfault on Cloud)
         st.markdown("#### [MAP] Supplier Locations")
-        map_data = [{"lat": s["lat"], "lon": s["lon"]} for s in all_suppliers]
-        if map_data:
-            st.map(map_data, zoom=4)
+        loc_table = [
+            {
+                "Supplier": s["name"],
+                "Equipment": s["equipment_type"],
+                "Origin": s["origin_city"],
+                "Destination": s["destination_city"],
+                "Status": s["shipment_status"],
+                "ETA (days)": s["eta_days"],
+            }
+            for s in all_suppliers
+        ]
+        st.dataframe(loc_table, use_container_width=True)
 
         # At-risk table
         if at_risk:
