@@ -1,0 +1,353 @@
+================================================================
+EPC INTELLIGENCE PLATFORM — WHAT WE BUILT
+ET AI Hackathon 2026
+================================================================
+
+PROJECT OVERVIEW
+----------------
+An AI-powered project intelligence platform for data centre EPC
+(Engineering, Procurement & Construction) delivery. Built to address
+the core problem stated in the hackathon brief: information
+fragmentation across specs, procurement, schedules, RFIs, and
+commissioning records that causes 67% of APAC data centre EPC
+projects to overrun by more than 10%.
+
+The platform puts a unified AI layer over all project data and lets
+engineers query everything in plain English through a browser.
+
+
+----------------------------------------------------------------
+PROBLEM IT SOLVES
+----------------------------------------------------------------
+- Procurement teams ordering equipment that does not match the spec
+- Schedule delays going undetected until they hit the critical path
+- Supplier shipments arriving late with no advance warning
+- Commissioning engineers manually checking TIA-942 test criteria
+- RFI answers buried in thousands of pages of project documents
+- No single place to see the health of the whole project
+
+
+----------------------------------------------------------------
+WHAT WE BUILT — FIVE AI AGENTS
+----------------------------------------------------------------
+
+1. SPECIFICATION & QUALITY COMPLIANCE AGENT
+   File: agents/spec_compliance.py
+
+   - Loads all procurement items from procurement_items.csv
+   - Compares every item's vendor-submitted value against the
+     project specification requirement
+   - Raises Non-Conformance Reports (NCRs) automatically for
+     any deviation, with severity classification (CRITICAL /
+     HIGH / MEDIUM / LOW) based on equipment category
+   - Generates formal NCR narratives via Groq LLM
+   - Accepts uploaded engineering drawings and vendor submittals
+     as images — sends them to Groq Llama 4 Scout vision model
+     for automated TIA-942 compliance review
+   - Falls back to filename-based analysis if vision API is
+     unavailable
+
+   Output: ComplianceReport with compliant items, deviations,
+           NCR audit log, and drawing review text
+
+
+2. PREDICTIVE SCHEDULE RISK ENGINE
+   File: agents/schedule_risk.py
+
+   - Loads project schedule from project_schedule.json
+   - Computes risk score for every task:
+     risk_score = lead_time_days - buffer_days
+   - Identifies critical path by propagating delays through
+     dependency chains (if task A is delayed, all tasks that
+     depend on A are also flagged)
+   - Classifies overall project risk as HIGH / MEDIUM / LOW
+   - Generates 3 specific, actionable mitigation options per
+     at-risk task using Groq LLM
+   - Falls back to pre-built mitigation lists per equipment
+     category (Generator, UPS, Cooling) if Groq is unavailable
+
+   Output: ScheduleRiskReport with violations, risk scores,
+           and mitigation options per task
+
+
+3. SUPPLY CHAIN VISIBILITY AGENT
+   File: agents/supply_chain.py
+
+   - Loads all supplier shipment records from
+     supplier_locations.json
+   - Tracks 10 critical equipment types: Generator, UPS, Cooling
+     Tower, LV Switchboard, PDU, Transfer Switch, BMS, Cable
+     Tray, Busduct, Precision AC
+   - Flags any shipment with ETA < 7 days that is not yet
+     delivered as AT RISK
+   - On demand, queries Groq to suggest 3 alternative qualified
+     suppliers in India with lead times and certifications
+   - Falls back to a hardcoded approved vendor list per equipment
+     type if Groq is unavailable
+
+   Output: Shipment status table, at-risk list, and alternative
+           supplier recommendations
+
+
+4. COMMISSIONING QA COPILOT
+   File: agents/commissioning_qa.py
+
+   - Covers 4 systems: power, cooling, network, fire
+   - Retrieves commissioning test sequences from TIA-942 and
+     Uptime Institute Tier III standards via the RAG engine
+   - Falls back to hardcoded expert checklists (7 steps for
+     power, 7 for cooling, 5 for network, 5 for fire) if RAG
+     score is below threshold
+   - Auto-validates measured values against acceptance criteria:
+     parses numeric comparisons (< 1 ohm, > 100 MΩ, ≤ 10 sec,
+     ranges like 18°C–27°C) and returns PASS / FAIL
+   - Keyword validation for qualitative results (pass/fail/
+     confirmed/compliant)
+   - Returns MANUAL_REVIEW when auto-determination is not
+     possible
+   - Generates a formal Test Record document via Groq, with
+     record ID, overall status, tester sign-off section
+   - Download button saves the test record as a .txt file
+
+   Output: Checklist, per-step validation results, formal
+           test record document
+
+
+5. RFI KNOWLEDGE & PROJECT INTELLIGENCE AGENT
+   File: agents/rfi_knowledge.py
+
+   - Loads all project RFIs from rfis.json and ingests them
+     into the RAG engine at startup
+   - Loads TIA-942 excerpts and Uptime Institute Tier concepts
+     from the standards text files
+   - Injects the full standards context + full RFI log directly
+     into Groq's 131K token context window (more reliable than
+     similarity search for exact spec lookups)
+   - Answers questions with source citations:
+     [SOURCE: tia942_excerpts.txt] or [SOURCE: RFI-001]
+   - Falls back to keyword overlap search across RFI index if
+     Groq is unavailable
+   - Identifies similar previously-resolved RFIs by keyword
+     overlap (threshold: 2+ matching words) to reduce re-work
+
+   Output: Answer with citations, list of similar resolved RFIs
+
+
+----------------------------------------------------------------
+ORCHESTRATOR
+----------------------------------------------------------------
+File: agents/orchestrator.py
+
+Routes any free-text query to the right agent automatically.
+
+Step 1 — Keyword classification (deterministic, no LLM cost):
+  Maps query words to agent categories using a keyword dictionary.
+  If any agent scores > 0, routes immediately.
+
+Step 2 — Groq classification (fallback if no keywords match):
+  Sends query to Groq with a strict system prompt listing all
+  5 categories and routing rules. Parses the response to get
+  the category name.
+
+Dispatch: calls the appropriate method on the routed agent
+and returns a structured result rendered in the sidebar.
+
+
+----------------------------------------------------------------
+RAG ENGINE
+----------------------------------------------------------------
+File: rag/rag_engine.py
+
+Pure Python in-memory keyword search store. No external
+dependencies, no C extensions, no vector database.
+
+Why not ChromaDB or FAISS?
+  Both install native C++ extensions (hnswlib). On Streamlit
+  Cloud's Linux container, these cause a process-level segfault
+  before any app code runs. Removing them eliminated the crash.
+
+How it works:
+  - Splits documents into 512-character chunks with 64-char
+    overlap
+  - Stores chunks in a plain Python list
+  - Scores by keyword overlap: |query_terms ∩ chunk_terms|
+                                / |query_terms|
+  - Returns top-K chunks by score
+
+Trade-off: less semantically precise than embeddings. Compensated
+by injecting full document context directly into Groq's 131K
+context window for the RFI agent.
+
+
+----------------------------------------------------------------
+GROQ CLIENT
+----------------------------------------------------------------
+File: core/groq_client.py
+
+Singleton pattern — one client instance per Streamlit session.
+Lazy initialisation — Groq() is not constructed at import time,
+only when the first generate() call is made. This prevents
+import-time crashes on Streamlit Cloud.
+
+Handles:
+  - RateLimitError (429) — returns friendly fallback message
+  - All other exceptions — returns error dict, never raises
+  - Vision calls (Llama 4 Scout) — handled directly in
+    spec_compliance.py using the raw _client
+
+
+----------------------------------------------------------------
+UI
+----------------------------------------------------------------
+File: ui/app.py
+
+Streamlit multi-tab interface.
+
+Tabs:
+  [*] Compliance      — NCR table, severity badges, drawing upload
+  [~] Schedule Risk   — Critical path violations, mitigation buttons
+  [>>] Supply Chain   — Shipment table, at-risk alerts, alternatives
+  [+] Commissioning   — System selector, checklist, validation, download
+  [?] RFI Intelligence — Chat interface, citations, similar RFIs
+
+Sidebar:
+  - Orchestrator query box (routes to any agent)
+  - Project health metrics (NCRs, at-risk shipments, schedule risk)
+
+Session state management:
+  - compliance_report, schedule_report computed once and cached
+  - test_results, checklist persisted across reruns
+  - drawing_review, test_record_doc stored so download buttons
+    survive Streamlit reruns (without this, buttons disappear
+    after first click)
+
+
+----------------------------------------------------------------
+DATA
+----------------------------------------------------------------
+data/synthetic/
+  procurement_items.csv     — 10 equipment items with spec vs
+                              submitted values, 4 deliberate
+                              deviations for demo
+  project_schedule.json     — 10 tasks with planned/actual dates,
+                              lead times, buffer days, dependencies
+  supplier_locations.json   — 10 supplier shipment records with
+                              origin/destination cities and ETA
+  rfis.json                 — 10 project RFIs (mix of open and
+                              closed) covering earthing, UPS
+                              autonomy, cable tray, ATS timing
+
+data/standards/
+  tia942_excerpts.txt       — Key TIA-942-B clauses: earthing,
+                              power, cooling, cable management,
+                              generator requirements
+  uptime_tier_concepts.txt  — Uptime Institute Tier III/IV
+                              requirements: redundancy, autonomy,
+                              concurrent maintainability
+
+
+----------------------------------------------------------------
+TECH STACK
+----------------------------------------------------------------
+LLM             Groq API — llama-3.3-70b-versatile (text)
+                           llama-4-scout-17b (vision)
+UI              Streamlit 1.32.0
+PDF parsing     pypdf 4.3.1
+Config          python-dotenv 1.0.1
+LLM client      groq 1.5.0
+RAG             Pure Python (no external deps)
+Python          3.11
+
+Total external dependencies: 4 packages
+
+
+----------------------------------------------------------------
+DEPLOYMENT
+----------------------------------------------------------------
+Platform:   Streamlit Community Cloud
+Repository: github.com/adityaprasa231195/epc-intelligence
+Branch:     main
+Main file:  ui/app.py
+Python:     3.11 (must be selected in Advanced Settings —
+            Python 3.14 causes a process-level segfault)
+
+Secrets required in Streamlit Cloud:
+  GROQ_API_KEY = "your_key_here"
+  GROQ_TEXT_MODEL = "llama-3.3-70b-versatile"
+
+Local setup:
+  pip install -r requirements.txt
+  cp .env.example .env  (add GROQ_API_KEY)
+  streamlit run ui/app.py
+
+
+----------------------------------------------------------------
+JUDGING CRITERIA ALIGNMENT
+----------------------------------------------------------------
+Innovation (25%)
+  Multi-agent orchestration with two-tier routing (keyword-first,
+  LLM fallback). Vision AI for drawing compliance review.
+  Pure Python RAG that works within Streamlit Cloud constraints.
+
+Business Impact (25%)
+  Directly addresses the 67% schedule overrun statistic from the
+  Turner & Townsend 2024 survey cited in the problem statement.
+  Targets all five problem areas: spec compliance, schedule risk,
+  supply chain, commissioning, and knowledge management.
+
+Technical Excellence (20%)
+  Lazy imports, singleton Groq client, session state persistence,
+  deterministic fallbacks for every LLM call, zero unnecessary
+  dependencies.
+
+Scalability (15%)
+  Swap the in-memory RAG store for ChromaDB or Pinecone with a
+  single file change in rag_engine.py. Replace synthetic JSON
+  data with live API integrations in each agent's _load_*
+  method. Add new agents by registering a keyword list and a
+  dispatch rule in orchestrator.py.
+
+User Experience (15%)
+  Tab-based layout, one-click quick queries, auto-validation
+  with human-readable reasons, download buttons for all
+  generated documents, project health dashboard in sidebar.
+
+
+----------------------------------------------------------------
+FILES IN THE REPOSITORY
+----------------------------------------------------------------
+epc-intelligence/
+├── agents/
+│   ├── commissioning_qa.py
+│   ├── orchestrator.py
+│   ├── rfi_knowledge.py
+│   ├── schedule_risk.py
+│   ├── spec_compliance.py
+│   └── supply_chain.py
+├── core/
+│   └── groq_client.py
+├── data/
+│   ├── standards/
+│   │   ├── tia942_excerpts.txt
+│   │   └── uptime_tier_concepts.txt
+│   └── synthetic/
+│       ├── procurement_items.csv
+│       ├── project_schedule.json
+│       ├── rfis.json
+│       └── supplier_locations.json
+├── rag/
+│   └── rag_engine.py
+├── ui/
+│   └── app.py
+├── .streamlit/
+│   └── config.toml
+├── .env.example
+├── ARCHITECTURE.md
+├── README.md
+├── WHAT_WE_BUILT.txt
+├── config.py
+└── requirements.txt
+
+================================================================
+END
+================================================================

@@ -1,0 +1,473 @@
+================================================================
+EPC INTELLIGENCE PLATFORM — LIVE DEMO SCRIPT
+ET AI Hackathon 2026
+Target time: 5 minutes | Maximum: 6 minutes
+================================================================
+
+NOTE TO PRESENTER:
+  - Read naturally. Do not rush.
+  - [PAUSE] means take a breath — let the screen load.
+  - [CLICK] means perform that action on screen.
+  - Words in (parentheses) are stage directions, not spoken.
+  - Practise once before the real demo.
+
+================================================================
+SECTION 1 — OPENING
+[ Target: 40 seconds ]
+================================================================
+
+Say:
+
+"India is building data centres at a scale we have never seen
+before. By 2027, the country will have tripled its data centre
+capacity — three times what it is today — with fifteen billion
+dollars of capital being deployed.
+
+But here is the problem. A 2024 industry survey found that 67%
+of data centre construction projects in Asia-Pacific overrun
+their schedule by more than 10%. The leading causes are
+procurement misalignment and commissioning failures.
+
+Why does this keep happening? Because the information is
+scattered everywhere. Specs are in one system. Procurement
+orders are in another. RFI answers are buried in email chains.
+And by the time someone spots a problem, it is already on the
+critical path.
+
+We built the EPC Intelligence Platform to fix this. It is a
+unified AI layer over your entire project — specs, schedules,
+supply chain, commissioning records, and RFIs — all connected,
+all queryable in plain English. Let me show you how it works."
+
+[PAUSE — 2 seconds]
+
+================================================================
+SECTION 2 — LIVE DEMO STORY
+[ Target: 3 minutes 30 seconds ]
+================================================================
+
+(Open the browser. The app should already be loaded and ready.)
+
+---
+SCENE 1 — THE PROJECT DASHBOARD
+---
+
+Say:
+
+"The moment you open the platform, the sidebar gives you the
+health of your entire project at a glance."
+
+(Point to the sidebar metrics)
+
+Say:
+
+"Right now we can see 4 open Non-Conformance Reports, 2 at-risk
+shipments, and the overall schedule risk is HIGH. These are not
+manual reports — the AI computed all of this automatically from
+your project data when the app started."
+
+[PAUSE — 1 second]
+
+---
+SCENE 2 — THE ORCHESTRATOR (Ask anything)
+---
+
+Say:
+
+"Before we dig into individual agents, let me show you something
+powerful. This is our AI Orchestrator."
+
+(Point to the sidebar query box)
+
+Say:
+
+"A project manager does not want to know which tab to click.
+They just want answers. So I can type any question here —
+watch what happens."
+
+[CLICK] — Type in the Orchestrator box:
+"Is the UPS delivery going to make the installation window?"
+
+[CLICK] — Click Ask button
+
+[PAUSE — wait for response]
+
+Say:
+
+"The Orchestrator automatically understood this was a supply
+chain question and routed it to the Supply Chain Agent. No
+manual selection. No dropdown. The AI figured it out.
+
+You can ask it anything —
+'Are there any non-conformances on the generator?'
+'What are the critical path delays?'
+'What does TIA-942 say about earthing resistance?'
+It always routes to the right agent."
+
+[PAUSE — 1 second]
+
+---
+SCENE 3 — COMPLIANCE AGENT (The UPS problem begins)
+---
+
+[CLICK] — Click the Compliance tab
+
+Say:
+
+"Let me tell you the story of our UPS system. A vendor just
+submitted their technical datasheet. Our Specification and
+Quality Compliance Agent checks it automatically — every
+single procurement item — against the project specification."
+
+(Point to the NCR table on screen)
+
+Say:
+
+"Look at this. The spec requires UPS battery autonomy of 15
+minutes at full load. The vendor submitted 10 minutes. That is
+a CRITICAL Non-Conformance. The system caught it instantly and
+logged it to the audit trail — without anyone manually reading
+the datasheet.
+
+In a traditional project, this might be discovered during
+commissioning — weeks later, after the equipment is already
+on site. Here it is flagged before anything leaves the factory."
+
+[PAUSE — 1 second]
+
+Say:
+
+"Now the vendor also sent us a drawing. Let me show you our
+Vision AI."
+
+[CLICK] — Click the drawing upload area
+(Upload a PNG or JPG image — any equipment drawing)
+
+[PAUSE — wait for analysis to appear]
+
+Say:
+
+"We just sent that image to Groq's Llama 4 Scout vision model.
+It is reading the actual drawing — identifying parameters,
+cross-checking them against TIA-942 Rating 3 requirements, and
+flagging any deviations. A compliance review that would take an
+engineer 30 minutes just happened in seconds."
+
+[PAUSE — 1 second]
+
+---
+SCENE 4 — SCHEDULE RISK ENGINE (The UPS delay ripples)
+---
+
+[CLICK] — Click the Schedule Risk tab
+
+Say:
+
+"So the UPS has a specification issue. Now the natural question
+is — does this affect our schedule? Let me show you."
+
+(Point to the overall risk badge)
+
+Say:
+
+"The Schedule Risk Engine has already run a full critical path
+analysis. Overall risk is HIGH. It does not just flag individual
+tasks — it propagates delays through the entire dependency
+chain. So if the UPS delivery slips, every task that depends on
+it — power testing, commissioning, Tier certification — all get
+flagged automatically."
+
+(Point to a critical path violation on screen)
+
+Say:
+
+"Let me generate mitigations for this task."
+
+[CLICK] — Click Generate Mitigations on a critical task
+
+[PAUSE — wait for Groq response]
+
+Say:
+
+"The AI just gave us three specific, actionable options —
+expedite factory testing, identify an alternative supplier,
+arrange a rental unit to bridge the gap. These are not generic
+suggestions. They are specific to this equipment type and this
+delay duration. A project manager can act on these right now."
+
+[PAUSE — 1 second]
+
+---
+SCENE 5 — SUPPLY CHAIN AGENT (Where is the equipment?)
+---
+
+[CLICK] — Click the Supply Chain tab
+
+Say:
+
+"Now let us look at where our equipment actually is."
+
+(Point to the shipment table)
+
+Say:
+
+"All 10 critical equipment shipments are tracked here — from
+generators and cooling towers to LV switchboards and PDUs.
+The system flags anything with an ETA under 7 days that has not
+been delivered yet as AT RISK."
+
+(Point to an at-risk item)
+
+Say:
+
+"This shipment is in trouble. Let me find alternatives."
+
+[CLICK] — Click Find Alternative Suppliers on an at-risk item
+
+[PAUSE — wait for response]
+
+Say:
+
+"Instantly — three qualified alternative suppliers in India,
+with typical lead times and relevant certifications. In a real
+project, your procurement team might spend a day making calls
+to get this list. We got it in under 10 seconds."
+
+[PAUSE — 1 second]
+
+---
+SCENE 6 — COMMISSIONING QA COPILOT
+---
+
+[CLICK] — Click the Commissioning QA tab
+
+Say:
+
+"The equipment eventually arrives on site. Now comes
+commissioning — arguably the most complex and high-stakes
+phase of any data centre build. One missed test step can
+cost you your Tier III certification."
+
+[CLICK] — Select "power" from the dropdown
+[CLICK] — Click Load Test Sequence
+
+[PAUSE — checklist loads]
+
+Say:
+
+"The system retrieved the power commissioning sequence directly
+from TIA-942 and Uptime Institute Tier III standards. Seven
+test steps, each with its acceptance criteria and the exact
+clause it comes from.
+
+Now watch what happens when an engineer enters a measured value."
+
+[CLICK] — In Step 1, type: 0.5 ohm
+
+Say:
+
+"The acceptance criteria is less than 1 ohm. The system parsed
+that — did the comparison — and returned PASS, with the reason
+shown right there. No manual lookup. No spreadsheet."
+
+[CLICK] — In Step 2, type: 50 MΩ
+
+Say:
+
+"Insulation resistance needs to be above 100 megaohms. 50 is
+below that — FAIL, with the exact reason. The engineer knows
+immediately, on site, what to re-test."
+
+[PAUSE — 1 second]
+
+Say:
+
+"Once all steps are complete, the engineer enters their name..."
+
+[CLICK] — Type a name in the Tester field
+[CLICK] — Click Generate Test Record Document
+
+[PAUSE — wait]
+
+Say:
+
+"A formal, professionally formatted commissioning test record is
+generated automatically — with a unique record ID, overall pass
+or fail status, and a sign-off section. One click to download it.
+The as-commissioned quality package, built automatically."
+
+[PAUSE — 1 second]
+
+---
+SCENE 7 — RFI INTELLIGENCE AGENT
+---
+
+[CLICK] — Click the RFI Intelligence tab
+
+Say:
+
+"Last but not least — every project generates hundreds of RFIs.
+Questions about specs, contract clauses, design decisions. And
+the answers are always somewhere — buried in old email threads,
+meeting minutes, previous submittals."
+
+[CLICK] — Click the quick query button or type in the chat:
+"What is the UPS battery autonomy requirement for Tier III?"
+
+[PAUSE — wait for answer]
+
+Say:
+
+"Look at that answer. It is specific. It cites its source —
+TIA-942, or a previously resolved RFI. And at the bottom, it
+found similar RFIs that were already resolved — so engineers
+do not waste time raising the same question twice.
+
+This is RAG — Retrieval Augmented Generation. The AI does not
+make up the answer. It retrieves the relevant standard or RFI,
+reads it, and answers with a citation. If we cannot trust the
+answer, the citation tells us exactly where to check."
+
+[PAUSE — 1 second]
+
+================================================================
+SECTION 3 — ARCHITECTURE
+[ Target: 30 seconds ]
+================================================================
+
+(Optional: show architecture diagram if printed or on slide)
+
+Say:
+
+"Let me quickly walk through what is under the hood.
+
+We have five specialist AI agents — each owning one domain:
+compliance, schedule, supply chain, commissioning, and knowledge.
+
+Above them sits the Orchestrator — it routes any plain-English
+question to the right agent, first by keyword matching, and if
+that fails, it asks the LLM to classify the intent.
+
+All agents run on Groq — one of the fastest LLM inference
+platforms available. Text generation uses Llama 3.3 70B.
+Drawing analysis uses Llama 4 Scout with vision capability.
+
+The knowledge layer is a RAG engine — it chunks the TIA-942
+standard and all project RFIs, retrieves the most relevant
+sections, and feeds them into the LLM as context. Every answer
+has a citation.
+
+The entire application runs on four Python packages. No heavy
+ML frameworks. No cloud databases. Fast, lean, and deployable
+in under 30 seconds."
+
+================================================================
+SECTION 4 — BUSINESS IMPACT
+[ Target: 30 seconds ]
+================================================================
+
+Say:
+
+"So what does this actually mean for a real project?
+
+First — issues are caught before they reach site. A spec
+deviation found in a factory audit costs almost nothing to fix.
+The same deviation found during commissioning can cost weeks
+and millions.
+
+Second — schedule risks are visible weeks in advance, not the
+day they become critical. Project managers get mitigation
+options, not just alerts.
+
+Third — commissioning time drops significantly. Test sequences
+are auto-generated from standards. Results are validated
+instantly. The quality documentation package builds itself.
+
+And fourth — there is now a single source of truth. Every
+engineer, every contractor, every project manager is looking
+at the same data, updated in real time.
+
+This is not a reporting tool. It is an active intelligence
+layer that catches problems before they become crises."
+
+================================================================
+SECTION 5 — CLOSING
+[ Target: 20 seconds ]
+================================================================
+
+Say:
+
+"India is building the AI infrastructure that the world will
+run on. The data centres going up right now will power the next
+decade of compute. They need to be built right, on time, to
+Tier III and Tier IV standards — with zero tolerance for errors.
+
+The EPC Intelligence Platform makes that possible. It takes the
+complexity of a hyperscale data centre build and gives every
+engineer on that project a co-pilot that never sleeps, never
+misses a spec, and always knows where the risks are.
+
+Thank you."
+
+[PAUSE — take a breath — smile — open for questions]
+
+================================================================
+BACKUP ANSWERS FOR Q&A
+================================================================
+
+Q: "Is this using real data or synthetic data?"
+A: "The demo uses synthetic project data we built to represent
+   a realistic Mumbai data centre EPC project — procurement
+   items, schedule, supplier locations, and RFIs. In production,
+   you replace the JSON files with live feeds from your project
+   management system. The agents do not change."
+
+Q: "How accurate is the RAG system without a vector database?"
+A: "For exact specification lookups — which is the primary use
+   case here — keyword retrieval on a controlled corpus of
+   standards is highly reliable. We also inject the full
+   document context into Groq's 131,000 token context window,
+   so the LLM sees everything, not just the retrieved chunks.
+   In production we would swap in a vector database for larger
+   corpora — it is a single file change."
+
+Q: "How long did this take to build?"
+A: "The core platform — all five agents, the orchestrator, the
+   RAG engine, and the UI — was built during the hackathon
+   period. The architecture is modular by design, so each agent
+   can be extended independently."
+
+Q: "Can this integrate with existing project management tools?"
+A: "Yes. Each agent loads data through a single _load method.
+   Replacing the JSON file with a Procore API call or a P6
+   schedule export is a straightforward swap. The AI layer
+   above it does not change."
+
+Q: "What happens if Groq is down or rate-limited?"
+A: "Every single LLM call has a deterministic fallback. If Groq
+   returns an error, the system falls back to pre-built data —
+   curated mitigation lists for schedule, approved vendor lists
+   for supply chain, expert commissioning checklists for QA.
+   The app never crashes and never shows a blank screen."
+
+================================================================
+TIMING GUIDE
+================================================================
+
+Section 1 — Opening          :  40 seconds
+Scene 1   — Dashboard        :  20 seconds
+Scene 2   — Orchestrator     :  35 seconds
+Scene 3   — Compliance       :  45 seconds
+Scene 4   — Schedule Risk    :  40 seconds
+Scene 5   — Supply Chain     :  30 seconds
+Scene 6   — Commissioning    :  50 seconds
+Scene 7   — RFI Intelligence :  30 seconds
+Section 3 — Architecture     :  30 seconds
+Section 4 — Business Impact  :  30 seconds
+Section 5 — Closing          :  20 seconds
+                               ──────────
+TOTAL                        :  ~5 min 50 sec
+
+================================================================
+END OF DEMO SCRIPT
+================================================================
